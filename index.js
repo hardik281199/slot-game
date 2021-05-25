@@ -24,7 +24,10 @@ var app = express();
 
 app.listen(3001,()=> console.log('Exapress server is runing at port no :3001'));
 
-let arr=["H1",'H2',"H3","WILD","SCATTER"];
+let arr=["H1","H2","A","K","WILD","J","H3","SCATTER"];
+let wallet =200000;
+let betAmount = 100;
+let freeSpin = 0;
 class Slotgame{
     
     randomInt(low, high){ 
@@ -82,15 +85,20 @@ class Slotgame{
         }
         return payTable;
     }
-    calculate(){
-
+    freeSpin (){
+        for (let index = 1; index <= 5; index++) {
+            betAmount = 0;
+            if (index === 5){
+                freeSpin--;
+            }
+            
+        }
     }
 
     matrix(){
-        const randomNumber = this.randomInt(0,4);
+        const randomNumber = this.randomInt(0,7);
         let c1= randomNumber;
-        let wallet =200000;
-        let betAmount = 100;
+        
         let result =[];
 
         const reel = {
@@ -124,52 +132,72 @@ class Slotgame{
         console.log(checkDemo);
         let d = 0;
         var payarray =this.payarray();
+        let sactterCount = 0;
         for (let a = 0; a < checkDemo.length; a++) {
             for (let b = 0; b < payarray.length; b++) { 
-                let symbole = checkDemo[a][d]; 
+                let symbol = checkDemo[a][d];
+                let checkItem = checkDemo[a][b];
+                //console.log(checkItem);
+                if (checkItem === 'SCATTER' && freeSpin === 0){
+                    sactterCount++;
+                }
+                
                 let payline = payarray[b];
                 let count = 0;
+                
                 console.log(payline);
-                if(payline[0] === a && symbole !== 'SCATTER'){
+                if(payline[0] === a && symbol !== 'SCATTER'){
                     count++;
                     for (let c = 1; c < payline.length; c++) {
-                        if (symbole === 'WILD' && checkDemo[payline[c]][c] !== 'SCATTER'){
-                             symbole = checkDemo[payline[c]][c];
+                        if (symbol === 'WILD' && checkDemo[payline[c]][c] !== 'SCATTER'){
+                             symbol = checkDemo[payline[c]][c];
                              count++;
                              continue;
                         }
-                        if (checkDemo[payline[c]][c] != 'WILD' && checkDemo[payline[c]][c] != symbole){
+                        if (checkDemo[payline[c]][c] != 'WILD' && checkDemo[payline[c]][c] != symbol){
                             break;
                         }
                         count++;
                     }
                     if (count > 2){
                         var Pay = this.paytable();
-                        console.log(symbole);
+                        console.log(symbol);
                         console.log(payline);
-                        console.log(Pay[`${symbole}`][`${count}ofakind`]);
-                        console.log("betAmount  "+betAmount * Pay[`${symbole}`][`${count}ofakind`]);
-                        wallet += betAmount * Pay[`${symbole}`][`${count}ofakind`];
+                        console.log(Pay[`${symbol}`][`${count}ofakind`]);
+                        console.log("betAmount  "+betAmount * Pay[`${symbol}`][`${count}ofakind`]);
+                        wallet += betAmount * Pay[`${symbol}`][`${count}ofakind`] - betAmount;
                         console.log("wallet     "+wallet); 
-                        // result.symbol = symbole;
+                        // result.symbol = symbol;
                         // result.Payline = payline;
                         // result.OfAkind = `${count}ofakind`;
-                        // result.WinAmunt = betAmount * Pay[`${symbole}`][`${count}ofakind`];
+                        // result.WinAmunt = betAmount * Pay[`${symbol}`][`${count}ofakind`];
                         //  result.betAmount = betAmount;
                         // result.wallet = wallet;
-                        result.push({symbole,wintype : `${count}ofakind`,Payline : payline ,WinAmunt : betAmount * Pay[`${symbole}`][`${count}ofakind`],betAmount : betAmount, wallet :wallet })  
+                        result.push({symbol,wintype : `${count}ofakind`,Payline : payline ,WinAmunt : betAmount * Pay[`${symbol}`][`${count}ofakind`],betAmount : betAmount, wallet :wallet})  
                     }
+                    
                 }
+                
                 
                 //console.log(wallet);
                 //console.log(betAmount);
                 
             }
         }
+        console.log(sactterCount);
+        if (sactterCount > 2) {
+            freeSpin =5 ;
+        }
+        if (result.length === 0){
+            wallet -= betAmount;
+            console.log(wallet);
+            result.push({betAmount : betAmount, wallet :wallet})
+        }
         
         return {
             viewZone : reel,
-            result    : result
+            result    : result,
+            freeSpin  : freeSpin
         };
 
     }
