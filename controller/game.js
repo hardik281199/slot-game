@@ -100,6 +100,14 @@ class SlotGame {
         return payTable;
     }
 
+    /**
+     * set response freeSpin
+     * @returns free spin ex :freeSpin :{
+                                    numberOfFreespins: 5,
+                                    currentFreeSpin: 0,
+                                    freeSpinTriggered: true
+                                }
+     */
     static freeSpin(){
         let scatterOffreeSpin = {
             numberOfFreespins: freeSpin > 0 ? 5 : 0,
@@ -109,6 +117,11 @@ class SlotGame {
           
         return scatterOffreeSpin;  
     }
+
+    /**
+     * whenever free spin not occurred 
+     * @returns wallet 
+     */
     static debitWinAmount (){
         wallet -= betAmount ;
 
@@ -204,11 +217,14 @@ class SlotGame {
                 }
             }
         }
+        // free spin counting and free spin not occurred
         if(freeSpin != 0){
             freeSpin--;
         }else{
             SlotGame.debitWinAmount();
         }
+
+        //when free spin given
         console.log(sactterCount);
         if (sactterCount > 2) {
             freeSpin =5 ;
