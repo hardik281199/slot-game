@@ -7,6 +7,7 @@ var arrayOfReel =  [["H1","H2","A","H4","K","WILD","J","Q","H3","SCATTER"]
 var wallet =200000;
 var betAmount = 100;
 var freeSpin = 0;
+var WinFreeSpinAmount = 0;
 class SlotGame {
     /**
      * generate ArrayOfNum
@@ -112,9 +113,13 @@ class SlotGame {
         let scatterOffreeSpin = {
             numberOfFreespins: freeSpin > 0 ? 5 : 0,
             currentFreeSpin: freeSpin,
-            freeSpinTriggered: freeSpin > 0 ? 'true' : 'false'
-          }
-          
+            freeSpinTriggered: freeSpin > 0 ? 'true' : 'false',
+            WinAmount : WinFreeSpinAmount
+        }
+        if(scatterOffreeSpin.currentFreeSpin === 0){
+            WinFreeSpinAmount = 0 ;
+        }
+        
         return scatterOffreeSpin;  
     }
 
@@ -128,9 +133,11 @@ class SlotGame {
         return wallet
     }
 
-    // static creditWinAmount(multipler){
-    //     wallet += betAmount * multipler;
-    // }
+    static creditWinAmount(multipler){
+        WinFreeSpinAmount += betAmount * multipler;
+
+        return WinFreeSpinAmount;
+    }
 
     /**
      * calculation of match payline and return json data,win amount
@@ -205,6 +212,9 @@ class SlotGame {
                     if (count > 2){
                         var Pay = SlotGame.paytable();
                         var multipler = Pay[`${symbol}`][`${count}ofakind`];
+                        if(freeSpin > 0){
+                            SlotGame.creditWinAmount(multipler);
+                        }
                         wallet += betAmount * multipler ;
                         result.push({symbol,wintype : `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler})  
                     }
