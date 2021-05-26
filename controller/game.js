@@ -1,4 +1,9 @@
-var arr =  ["H1","H2","A","K","WILD","J","H3","SCATTER"];
+var arrayOfReel =  [["H1","H2","A","H4","K","WILD","J","Q","H3","SCATTER"]
+,["WILD","J","H3","H4","SCATTER","H1","H2","A","K","Q"]
+,["H4","J","H3","SCATTER","H1","H2","A","Q","K","WILD",]
+, ["SCATTER","WILD","H2","Q","J","H1","H3","A","H4","K"]
+,["J","A","H4","K","H3","H2","WILD","Q","SCATTER","H1"]];
+
 var wallet =200000;
 var betAmount = 100;
 var freeSpin = 0;
@@ -26,8 +31,12 @@ class SlotGame {
      * @param {*} col number of col
      * @returns symbole of array ex :[h1+1,h2+1,h3+3,h4+4,h5+5]
      */
-     static getSymbol(randomArr, reelLength, reel, col){
-        return arr[(randomArr[reel] + col) % reelLength]
+     static getSymbol(randomArr,arrayOfReel ,reelLength, reel, col){
+        let symbol = arrayOfReel[(randomArr[reel] + col) % reelLength];
+        console.log(reelLength + "    lenth");
+        console.log(symbol + "  symbole ");
+        console.log(arrayOfReel + "  arrayOfReel");
+        return symbol;
     }
 
     /**
@@ -97,8 +106,8 @@ class SlotGame {
      * @param {*} res 
      */
     static matrix(req, res){
-        console.log(this);
-        const randomNumber = SlotGame.randomInt(0,7);
+        //console.log(this);
+        const randomNumber = SlotGame.randomInt(0,9);
         console.log(randomNumber);
         let result =[];
 
@@ -117,7 +126,7 @@ class SlotGame {
         //create view zone
         for(let reel = 0;reel < 5;reel++){
             for(let col = 0; col< 3; col++) {
-                 const symbol = SlotGame.getSymbol(randomNumber,arr.length, reel, col);
+                 const symbol = SlotGame.getSymbol(randomNumber,arrayOfReel[reel],arrayOfReel[reel].length, reel, col);
                  console.log(reel);
                  viewZone[`reel${reel}`].push(symbol);
             }
@@ -141,29 +150,29 @@ class SlotGame {
         let sactterCount = 0;
 
         // in matrix check payline available 
-        for (let a = 0; a < matrixReelXCol.length; a++) {
-            for (let b = 0; b < payarray.length; b++) { 
-                let symbol = matrixReelXCol[a][d];
-                let checkScatter= matrixReelXCol[a][b];
+        for (let rowOfMatrix = 0; rowOfMatrix < matrixReelXCol.length; rowOfMatrix++) {
+            for (let rowOfPayArray = 0; rowOfPayArray < payarray.length; rowOfPayArray++) { 
+                let symbol = matrixReelXCol[rowOfMatrix][d];
+                let checkScatter= matrixReelXCol[rowOfMatrix][rowOfPayArray];
                 
                 //checkScatter
                 if (checkScatter === 'SCATTER' && freeSpin === 0){
                     sactterCount++;
                 }
                 
-                let payline = payarray[b];
+                let payline = payarray[rowOfPayArray];
                 let count = 0;
                 
                 console.log(payline);
-                if(payline[0] === a && symbol !== 'SCATTER'){
+                if(payline[0] === rowOfMatrix && symbol !== 'SCATTER'){
                     count++;
-                    for (let c = 1; c < payline.length; c++) {
-                        if (symbol === 'WILD' && matrixReelXCol[payline[c]][c] !== 'SCATTER'){
-                             symbol = matrixReelXCol[payline[c]][c];
+                    for (let element = 1; element < payline.length; element++) {
+                        if (symbol === 'WILD' && matrixReelXCol[payline[element]][element] !== 'SCATTER'){
+                             symbol = matrixReelXCol[payline[element]][element];
                              count++;
                              continue;
                         }
-                        if (matrixReelXCol[payline[c]][c] != 'WILD' && matrixReelXCol[payline[c]][c] != symbol){
+                        if (matrixReelXCol[payline[element]][element] != 'WILD' && matrixReelXCol[payline[element]][element] != symbol){
                             break;
                         }
                         count++;
