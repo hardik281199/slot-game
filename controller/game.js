@@ -112,7 +112,7 @@ class SlotGame {
     static freeSpin(){
         let scatterOffreeSpin = {
             numberOfFreespins: freeSpin > 0 ? 5 : 0,
-            currentFreeSpin: freeSpin,
+            remainingSpins: freeSpin,
             freeSpinTriggered: freeSpin > 0 ? 'true' : 'false',
             WinAmount : WinFreeSpinAmount
         }
