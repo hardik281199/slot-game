@@ -86,18 +86,28 @@ class SlotGame {
                 "4ofakind": 10,
                 "5ofakind": 20
             },
+            "Q":{
+                "3ofakind": 0,
+                "4ofakind": 0,
+                "5ofakind": 0
+            },
+            "H4":{
+                "3ofakind": 0,
+                "4ofakind": 0,
+                "5ofakind": 0
+            }
         }
         return payTable;
     }
 
-    static freeSpin (){
-        for (let index = 1; index <= 5; index++) {
-            betAmount = 0;
-            if (index === 5){
-                freeSpin--;
-            }
-            
-        }
+    static debitWinAmount (){
+        wallet -= betAmount ;
+
+        return wallet
+    }
+
+    static creditWinAmount(multipler){
+        wallet += betAmount * multipler;
     }
 
     /**
@@ -152,14 +162,7 @@ class SlotGame {
         // in matrix check payline available 
         for (let rowOfMatrix = 0; rowOfMatrix < matrixReelXCol.length; rowOfMatrix++) {
             for (let rowOfPayArray = 0; rowOfPayArray < payarray.length; rowOfPayArray++) { 
-                let symbol = matrixReelXCol[rowOfMatrix][d];
-                let checkScatter= matrixReelXCol[rowOfMatrix][rowOfPayArray];
-                
-                //checkScatter
-                if (checkScatter === 'SCATTER' && freeSpin === 0){
-                    sactterCount++;
-                }
-                
+                let symbol = matrixReelXCol[rowOfMatrix][d];             
                 let payline = payarray[rowOfPayArray];
                 let count = 0;
                 
@@ -179,27 +182,29 @@ class SlotGame {
                     }
                     if (count > 2){
                         var Pay = SlotGame.paytable();
-                        console.log(symbol);
-                        console.log(payline);
-                        console.log(Pay[`${symbol}`][`${count}ofakind`]);
-                        console.log("betAmount  "+betAmount * Pay[`${symbol}`][`${count}ofakind`]);
-                        wallet += betAmount * Pay[`${symbol}`][`${count}ofakind`] - betAmount;
-                        console.log("wallet     "+wallet);
-                        result.push({symbol,wintype : `${count}ofakind`,Payline : payline ,WinAmount : betAmount * Pay[`${symbol}`][`${count}ofakind`]})  
+                        var multipler = Pay[`${symbol}`][`${count}ofakind`];
+                        wallet += betAmount * multipler ;
+                        result.push({symbol,wintype : `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler})  
                     }
                     
                 }
+                let checkScatter= matrixReelXCol[rowOfMatrix][rowOfPayArray];
+                //checkScatter
+                if (checkScatter === 'SCATTER' && freeSpin === 0){
+                    sactterCount++;
+                }
             }
+        }
+        if(freeSpin != 0){
+            freeSpin--;
+        }else{
+            SlotGame.debitWinAmount();
         }
         console.log(sactterCount);
         if (sactterCount > 2) {
             freeSpin =5 ;
         }
-        if (result.length === 0){
-            wallet -= betAmount;
-            console.log(wallet);
-            result.push({betAmount : betAmount, wallet :wallet})
-        }
+        
         res.send({
             viewZone  : viewZone,
             result    : result,
