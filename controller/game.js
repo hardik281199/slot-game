@@ -100,15 +100,24 @@ class SlotGame {
         return payTable;
     }
 
+    static freeSpin(){
+        let scatterOffreeSpin = {
+            numberOfFreespins: freeSpin > 0 ? 5 : 0,
+            currentFreeSpin: freeSpin,
+            freeSpinTriggered: freeSpin > 0 ? 'true' : 'false'
+          }
+          
+        return scatterOffreeSpin;  
+    }
     static debitWinAmount (){
         wallet -= betAmount ;
 
         return wallet
     }
 
-    static creditWinAmount(multipler){
-        wallet += betAmount * multipler;
-    }
+    // static creditWinAmount(multipler){
+    //     wallet += betAmount * multipler;
+    // }
 
     /**
      * calculation of match payline and return json data,win amount
@@ -203,6 +212,8 @@ class SlotGame {
         console.log(sactterCount);
         if (sactterCount > 2) {
             freeSpin =5 ;
+              
+              
         }
         
         res.send({
@@ -210,7 +221,7 @@ class SlotGame {
             result    : result,
             betAmount : betAmount, 
             wallet    : wallet,
-            freeSpin  : freeSpin
+            freeSpin  : SlotGame.freeSpin()
         })            
     }
 }
