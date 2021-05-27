@@ -1,29 +1,11 @@
-const mysql =require('mysql');
+const BodyParser = require('body-parser');
+const JsonWebToken = require('jsonwebtoken');
+const UUID = require('uuid');
 const express = require('express');
 const game = require('./controller/game');
+const login = require('./authentication/auth');
+const connection = require('./connection/connection')
 var app = express();
-
-//const router = Router();
-// var mysqlConn = mysql.createConnection({
-//     host:'localhost',
-//     user:'root',
-//     password:'Root@123',
-//     database:'project_db'
-// });
-
-// mysqlConn.connect((err)=>{
-
-//     if(!err){
-//         console.log('db connection success');
-//     }
-//     else{
-//         console.log('db connection failed \n');
-//     }
-// });
-
-//controllergame();
-//     res.status(200).send(slotgame.matrix());
-// })
 
 app.post('/spin', game.matrix);
 
