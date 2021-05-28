@@ -1,3 +1,4 @@
+// reel configurations for all 5 reels
 var arrayOfReel =  [["H1","H2","A","H4","K","WILD","J","Q","H3","SCATTER"]
 ,["WILD","J","H3","H4","SCATTER","H1","H2","A","K","Q"]
 ,["H4","J","H3","SCATTER","H1","H2","A","Q","K","WILD",]
@@ -9,13 +10,15 @@ var betAmount = 100;
 var freeSpin = 0;
 var WinFreeSpinAmount = 0;
 class SlotGame {
+
     /**
-     * generate ArrayOfNum
-     * @param {*} low  first index of reel config
-     * @param {*} high last index of reel config
+     * It generates an array of random numbers
+     * these random numbers will be used to generate viewzone
+     * @param {low}  first index of reel config
+     * @param {high} last index of reel config
      * @returns ArrayOfNumbers Ex :[1,2,3,4,5]
      */
-    static randomInt(low, high){ 
+    randomInt(low, high){ 
         let numOfArry = [];
         for (let i = 0; i < 5; i++) {
             const element = Math.floor(Math.random() * (high - low + 1) + low);
@@ -26,13 +29,13 @@ class SlotGame {
     
     /**
      * It returns particular symbol at requested reel & column index from reel configuration
-     * @param {*} randomArr random array
-     * @param {*} reelLength length of random array
-     * @param {*} reel number of reel
-     * @param {*} col number of col
+     * @param {randomArr} randomArr random array
+     * @param {reelLength} reelLength length of random array
+     * @param {reel} reel number of reel
+     * @param {col} col number of col
      * @returns symbole of array ex :[h1+1,h2+1,h3+3,h4+4,h5+5]
      */
-     static getSymbol(randomArr,arrayOfReel ,reelLength, reel, col){
+    getSymbol(randomArr,arrayOfReel ,reelLength, reel, col){
         let symbol = arrayOfReel[(randomArr[reel] + col) % reelLength];
         console.log(reelLength + "    lenth");
         console.log(symbol + "  symbole ");
@@ -43,9 +46,8 @@ class SlotGame {
     /**
      * create Payline in view zone
      * @returns array of payline ex : [0,0,0,0,0]
-     * 
      */
-    static payarray(){
+    payarray(){
         let Payline = [[0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2],[0,0,1,2,2],[2,2,1,0,0]];        
         return Payline;
     }
@@ -55,7 +57,7 @@ class SlotGame {
      * @returns json data of smymbol of kind multipler
      * 
      */
-    static paytable(){
+    paytable(){
         let payTable = {
             "H1":{
                 "3ofakind":50,
@@ -103,13 +105,9 @@ class SlotGame {
 
     /**
      * set response freeSpin
-     * @returns free spin ex :freeSpin :{
-                                    numberOfFreespins: 5,
-                                    currentFreeSpin: 0,
-                                    freeSpinTriggered: true
-                                }
+     * @returns free spin details [numberOfFreespins, currentFreeSpin, freeSpinTriggered] 
      */
-    static freeSpin(){
+    freeSpin(){
         let scatterOffreeSpin = {
             numberOfFreespins: freeSpin > 0 ? 5 : 0,
             remainingSpins: freeSpin,
@@ -127,13 +125,18 @@ class SlotGame {
      * whenever free spin not occurred 
      * @returns wallet 
      */
-    static debitWinAmount (){
+    debitWinAmount (){
         wallet -= betAmount ;
 
         return wallet
     }
 
-    static creditWinAmount(multipler){
+    /**
+     * whenever free spin occurred 
+     * @param {multipler} multipler total win amount
+     * @returns in free spin count total win amount
+     */
+    creditWinAmount(multipler){
         WinFreeSpinAmount += betAmount * multipler;
 
         return WinFreeSpinAmount;
@@ -144,9 +147,9 @@ class SlotGame {
      * @param {*} req 
      * @param {*} res 
      */
-    static matrix(req, res){
+    matrix(req, res){
         //console.log(this);
-        const randomNumber = SlotGame.randomInt(0,9);
+        const randomNumber = slotGameObj.randomInt(0,9);
         console.log(randomNumber);
         let result =[];
 
@@ -165,7 +168,7 @@ class SlotGame {
         //create view zone
         for(let reel = 0;reel < 5;reel++){
             for(let col = 0; col< 3; col++) {
-                 const symbol = SlotGame.getSymbol(randomNumber,arrayOfReel[reel],arrayOfReel[reel].length, reel, col);
+                 const symbol = slotGameObj.getSymbol(randomNumber,arrayOfReel[reel],arrayOfReel[reel].length, reel, col);
                  console.log(reel);
                  viewZone[`reel${reel}`].push(symbol);
             }
@@ -185,7 +188,7 @@ class SlotGame {
         } 
         console.log(matrixReelXCol);
         let d = 0;
-        var payarray =SlotGame.payarray();
+        var payarray =slotGameObj.payarray();
         let sactterCount = 0;
 
         // in matrix check payline available 
@@ -210,10 +213,10 @@ class SlotGame {
                         count++;
                     }
                     if (count > 2){
-                        var Pay = SlotGame.paytable();
+                        var Pay = slotGameObj.paytable();
                         var multipler = Pay[`${symbol}`][`${count}ofakind`];
                         if(freeSpin > 0){
-                            SlotGame.creditWinAmount(multipler);
+                            slotGameObj.creditWinAmount(multipler);
                         }
                         wallet += betAmount * multipler ;
                         result.push({symbol,wintype : `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler})  
@@ -231,7 +234,7 @@ class SlotGame {
         if(freeSpin != 0){
             freeSpin--;
         }else{
-            SlotGame.debitWinAmount();
+            slotGameObj.debitWinAmount();
         }
 
         //when free spin given
@@ -247,11 +250,10 @@ class SlotGame {
             result    : result,
             betAmount : betAmount, 
             wallet    : wallet,
-            freeSpin  : SlotGame.freeSpin()
+            freeSpin  : slotGameObj.freeSpin()
         })            
     }
 }
 
-// const slotGame = new SlotGame();
-module.exports = SlotGame
-// export default SlotGame;
+const slotGameObj = new SlotGame();
+module.exports.slotGame= slotGameObj
