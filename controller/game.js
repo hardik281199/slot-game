@@ -1,14 +1,14 @@
 // reel configurations for all 5 reels
-var arrayOfReel =  [["H1","H2","A","H4","K","WILD","J","Q","H3","SCATTER"]
+let arrayOfReel =  [["H1","H2","A","H4","K","WILD","J","Q","H3","SCATTER"]
 ,["WILD","J","H3","H4","SCATTER","H1","H2","A","K","Q"]
 ,["H4","J","H3","SCATTER","H1","H2","A","Q","K","WILD",]
 , ["SCATTER","WILD","H2","Q","J","H1","H3","A","H4","K"]
 ,["J","A","H4","K","H3","H2","WILD","Q","SCATTER","H1"]];
 
-var wallet =200000;
-var betAmount = 100;
-var freeSpin = 0;
-var WinFreeSpinAmount = 0;
+let wallet =200000;
+let betAmount = 100;
+let freeSpin = 0;
+let WinFreeSpinAmount = 0;
 class SlotGame {
 
     /**
@@ -181,14 +181,14 @@ class SlotGame {
             let arrar = [];           
             
             for (let matrixRow = 0; matrixRow < 5; matrixRow++) {
-                var num = generatedArray[matrixRow][matrixCol];
+                let num = generatedArray[matrixRow][matrixCol];
                 arrar[matrixRow] = num;
             }            
             matrixReelXCol.push(arrar);                      
         } 
         console.log(matrixReelXCol);
         let d = 0;
-        var payarray =slotGameObj.payarray();
+        let payarray =slotGameObj.payarray();
         let sactterCount = 0;
 
         // in matrix check payline available 
@@ -213,8 +213,8 @@ class SlotGame {
                         count++;
                     }
                     if (count > 2){
-                        var Pay = slotGameObj.paytable();
-                        var multipler = Pay[`${symbol}`][`${count}ofakind`];
+                        let Pay = slotGameObj.paytable();
+                        let multipler = Pay[`${symbol}`][`${count}ofakind`];
                         if(freeSpin > 0){
                             slotGameObj.creditWinAmount(multipler);
                         }
