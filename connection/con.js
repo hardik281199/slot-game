@@ -1,6 +1,6 @@
 const Couchbase = require('couchbase');
 
-var cluster = new Couchbase.Cluster("couchbase://localhost", {
+var cluster = new Couchbase.Cluster("couchbase://127.0.0.1", {
    username: 'hardik',
    password: 'Hardik@123' 
 });
