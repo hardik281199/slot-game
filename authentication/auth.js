@@ -37,11 +37,11 @@ class Auth {
             if(error) {
                 return response.status(500).send({ code: error.code, message: error.message });
             }
-            Bcrypt.compare(req.body.password,account.value.password ,function(error,result){
+            Bcrypt.compare(req.body.password,account.value.password ,(error,result)=>{
                 if(error || !result) {
                     return response.status(401).send({ "success": false, "message": "Invalid username and password" });
                 }
-                let token = JsonWebToken.sign(account.content.User_Id, 'hardikdobariya');
+                let token = JsonWebToken.sign(account.content.User_Id, process.env.JWT_SECRET);
                 res.send({"token": token});
             })
         })

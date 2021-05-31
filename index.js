@@ -1,14 +1,13 @@
+const dotenv = require('dotenv');
 const BodyParser = require('body-parser');
 const express = require('express');
-const  { slotGame } = require('./controller/game');
-const { auth } = require('./authentication/auth');
+dotenv.config()
 //const connection = require('./connection/con')
 var app = express();
+require('./route/routes')(app);
 
 app.use(BodyParser.json());
-app.post('/login',auth.login);
-app.post('/register',auth.register);
-app.post('/spin', slotGame.matrix);
 
-app.listen(3001,() => console.log('Exapress server is runing at port no :3001'));
+console.log(process.env.PORT);
+app.listen(process.env.PORT,() => console.log('Exapress server is runing at port no :3001'));
 module.exports = app;
