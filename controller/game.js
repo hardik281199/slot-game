@@ -1,3 +1,6 @@
+
+const { couchbaseCollection } = require('../connection/con');
+
 // reel configurations for all 5 reels
 let arrayOfReel =  [["H1","H2","A","H4","K","WILD","J","Q","H3","SCATTER"]
 ,["WILD","J","H3","H4","SCATTER","H1","H2","A","K","Q"]
@@ -5,8 +8,6 @@ let arrayOfReel =  [["H1","H2","A","H4","K","WILD","J","Q","H3","SCATTER"]
 , ["SCATTER","WILD","H2","Q","J","H1","H3","A","H4","K"]
 ,["J","A","H4","K","H3","H2","WILD","Q","SCATTER","H1"]];
 
-let wallet =200000;
-let betAmount = 100;
 let freeSpin = 0;
 let WinFreeSpinAmount = 0;
 class SlotGame {
@@ -37,9 +38,6 @@ class SlotGame {
      */
     getSymbol(randomArr,arrayOfReel ,reelLength, reel, col){
         let symbol = arrayOfReel[(randomArr[reel] + col) % reelLength];
-        console.log(reelLength + "    lenth");
-        console.log(symbol + "  symbole ");
-        console.log(arrayOfReel + "  arrayOfReel");
         return symbol;
     }
 
@@ -53,9 +51,8 @@ class SlotGame {
     }
 
     /**
-     * 
+     * this function use where pair come in view zone
      * @returns json data of smymbol of kind multipler
-     * 
      */
     paytable(){
         let payTable = {
@@ -114,7 +111,7 @@ class SlotGame {
             freeSpinTriggered: freeSpin > 0 ? 'true' : 'false',
             WinAmount : WinFreeSpinAmount
         }
-        if(scatterOffreeSpin.currentFreeSpin === 0){
+        if(scatterOffreeSpin.remainingSpins === 0){
             WinFreeSpinAmount = 0 ;
         }
         
@@ -125,10 +122,9 @@ class SlotGame {
      * whenever free spin not occurred 
      * @returns wallet 
      */
-    debitWinAmount (){
-        wallet -= betAmount ;
-
-        return wallet
+    debitWinAmount (xyz,betAmount){
+         this.wallet =xyz- betAmount ;
+        return this.wallet
     }
 
     /**
@@ -136,7 +132,7 @@ class SlotGame {
      * @param {multipler} multipler total win amount
      * @returns in free spin count total win amount
      */
-    creditWinAmount(multipler){
+    creditWinAmount(multipler,betAmount){
         WinFreeSpinAmount += betAmount * multipler;
 
         return WinFreeSpinAmount;
@@ -147,111 +143,120 @@ class SlotGame {
      * @param {*} req 
      * @param {*} res 
      */
-    matrix(req, res){
-        //console.log(this);
-        const randomNumber = slotGameObj.randomInt(0,9);
-        console.log(randomNumber);
-        let result =[];
-
-        /**
-         * prepared json reel of viewZone
-         */
-        const viewZone = {
-            reel0: [],
-            reel1: [],
-            reel2: [],
-            reel3: [],
-            reel4: []
-        };        
-        let generatedArray = [];
+    matrix = (req, res) => {
         
-        //create view zone
-        for(let reel = 0;reel < 5;reel++){
-            for(let col = 0; col< 3; col++) {
-                 const symbol = slotGameObj.getSymbol(randomNumber,arrayOfReel[reel],arrayOfReel[reel].length, reel, col);
-                 console.log(reel);
-                 viewZone[`reel${reel}`].push(symbol);
-            }
-            generatedArray.push(viewZone[`reel${reel}`])
-        }
-        
-        //create Reel X colume matrix
-        let matrixReelXCol = [];
-        for (let matrixCol = 0; matrixCol < 3; matrixCol++) {
-            let arrar = [];           
-            
-            for (let matrixRow = 0; matrixRow < 5; matrixRow++) {
-                let num = generatedArray[matrixRow][matrixCol];
-                arrar[matrixRow] = num;
-            }            
-            matrixReelXCol.push(arrar);                      
-        } 
-        console.log(matrixReelXCol);
-        let d = 0;
-        let payarray =slotGameObj.payarray();
-        let sactterCount = 0;
+        couchbaseCollection.get(req.token.email,(error,reslt)=>{
+            if (!reslt.content.jwt){
+                return res.status(401).send({ "success": false, "message": "Invalid Authoriz" });
+            } else {
+                let wallet = reslt.content.wallet;
+                let betAmount = reslt.content.betAmount;
+                const randomNumber = this.randomInt(0,9);
+                let result =[];
 
-        // in matrix check payline available 
-        for (let rowOfMatrix = 0; rowOfMatrix < matrixReelXCol.length; rowOfMatrix++) {
-            for (let rowOfPayArray = 0; rowOfPayArray < payarray.length; rowOfPayArray++) { 
-                let symbol = matrixReelXCol[rowOfMatrix][d];             
-                let payline = payarray[rowOfPayArray];
-                let count = 0;
+                /**
+                 * prepared json reel of viewZone
+                 */
+                const viewZone = {
+                    reel0: [],
+                    reel1: [],
+                    reel2: [],
+                    reel3: [],
+                    reel4: []
+                };        
+                let generatedArray = [];
                 
-                console.log(payline);
-                if(payline[0] === rowOfMatrix && symbol !== 'SCATTER'){
-                    count++;
-                    for (let element = 1; element < payline.length; element++) {
-                        if (symbol === 'WILD' && matrixReelXCol[payline[element]][element] !== 'SCATTER'){
-                             symbol = matrixReelXCol[payline[element]][element];
-                             count++;
-                             continue;
-                        }
-                        if (matrixReelXCol[payline[element]][element] != 'WILD' && matrixReelXCol[payline[element]][element] != symbol){
-                            break;
-                        }
-                        count++;
+                //create view zone
+                for(let reel = 0;reel < 5;reel++){
+                    for(let col = 0; col< 3; col++) {
+                        const symbol = this.getSymbol(randomNumber,arrayOfReel[reel],arrayOfReel[reel].length, reel, col);
+                        viewZone[`reel${reel}`].push(symbol);
                     }
-                    if (count > 2){
-                        let Pay = slotGameObj.paytable();
-                        let multipler = Pay[`${symbol}`][`${count}ofakind`];
-                        if(freeSpin > 0){
-                            slotGameObj.creditWinAmount(multipler);
+                    generatedArray.push(viewZone[`reel${reel}`])
+                }
+                
+                //create Reel X colume matrix
+                let matrixReelXCol = [];
+                for (let matrixCol = 0; matrixCol < 3; matrixCol++) {
+                    let arrar = [];           
+                    
+                    for (let matrixRow = 0; matrixRow < 5; matrixRow++) {
+                        let num = generatedArray[matrixRow][matrixCol];
+                        arrar[matrixRow] = num;
+                    }            
+                    matrixReelXCol.push(arrar);                      
+                } 
+                
+                let d = 0;
+                let payarray =this.payarray();
+                let sactterCount = 0;
+
+                // in matrix check payline available 
+                for (let rowOfMatrix = 0; rowOfMatrix < matrixReelXCol.length; rowOfMatrix++) {
+                    for (let rowOfPayArray = 0; rowOfPayArray < payarray.length; rowOfPayArray++) { 
+                        let symbol = matrixReelXCol[rowOfMatrix][d];             
+                        let payline = payarray[rowOfPayArray];
+                        let count = 0;
+                        if(payline[0] === rowOfMatrix && symbol !== 'SCATTER'){
+                            count++;
+                            for (let element = 1; element < payline.length; element++) {
+                                if (symbol === 'WILD' && matrixReelXCol[payline[element]][element] !== 'SCATTER'){
+                                    symbol = matrixReelXCol[payline[element]][element];
+                                    count++;
+                                    continue;
+                                }
+                                if (matrixReelXCol[payline[element]][element] != 'WILD' && matrixReelXCol[payline[element]][element] != symbol){
+                                    break;
+                                }
+                                count++;
+                            }
+                            if (count > 2){
+                                let Pay = this.paytable();
+                                let multipler = Pay[`${symbol}`][`${count}ofakind`];
+                                if(freeSpin > 0){
+                                    this.creditWinAmount(multipler,betAmount);
+                                }
+                                wallet += betAmount * multipler ;
+                                result.push({symbol,wintype : `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler})  
+                            }
+                            
                         }
-                        wallet += betAmount * multipler ;
-                        result.push({symbol,wintype : `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler})  
+                        let checkScatter= matrixReelXCol[rowOfMatrix][rowOfPayArray];
+                        //checkScatter
+                        if (checkScatter === 'SCATTER' && freeSpin === 0){
+                            sactterCount++;
+                        }
                     }
+                }
+                // free spin counting and free spin not occurred
+                if(freeSpin != 0){
+                    freeSpin--;
+                }else{
+                    //this.debitWinAmount(wallet,betAmount);
+                    wallet -= betAmount
                     
                 }
-                let checkScatter= matrixReelXCol[rowOfMatrix][rowOfPayArray];
-                //checkScatter
-                if (checkScatter === 'SCATTER' && freeSpin === 0){
-                    sactterCount++;
+                
+                //when free spin given
+             
+                if (sactterCount > 2) {
+                    freeSpin =5 ;
                 }
-            }
-        }
-        // free spin counting and free spin not occurred
-        if(freeSpin != 0){
-            freeSpin--;
-        }else{
-            slotGameObj.debitWinAmount();
-        }
 
-        //when free spin given
-        console.log(sactterCount);
-        if (sactterCount > 2) {
-            freeSpin =5 ;
-              
-              
-        }
-        
-        res.send({
-            viewZone  : viewZone,
-            result    : result,
-            betAmount : betAmount, 
-            wallet    : wallet,
-            freeSpin  : slotGameObj.freeSpin()
-        })            
+                reslt.content.wallet = wallet;
+                reslt.content.betAmount = betAmount;
+                couchbaseCollection.upsert( reslt.content.email,reslt.content);
+                
+                res.send({
+                    viewZone  : viewZone,
+                    result    : result,
+                    betAmount : betAmount, 
+                    wallet    : wallet,
+                    freeSpin  : this.freeSpin()
+                }) 
+            }
+        });
+                   
     }
 }
 

@@ -4,52 +4,82 @@ const JsonWebToken = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
 class Auth {
 
+    /**
+     * Create Account
+     * add new account in data base
+     * @param {*} req request data 
+     * @param {*} res responce result 
+     */
     register(req, res) {
-        // console.log(couchbaseCollection, 'dsfdsfdss');
-        if (!req.body.email) {
-            return res.status(401).send({ "message": "An `email` is required" })
-        } else if (!req.body.password) {
-            return res.status(401).send({ "message": "A `password` is required" })
-        }
+        
         let id = UUID.v4();
         const account = {
             "User_Id": id,
             "email": req.body.email,
-            "password": Bcrypt.hashSync(req.body.password, 10)
+            "password": Bcrypt.hashSync(req.body.password, 10),
+            "wallet" : 200000,
+            "betAmount" : 100   
         }
-        couchbaseCollection.insert(req.body.email, account, (error, result) => {
-            if (error) {
-                return res.status(500).send({});
+        couchbaseCollection.get(req.body.email,account,(err,reslt)=>{
+            if(!reslt){
+                return res.status(401).send({ "success": false, "message": "This `Email Id` exists" });
+            }else{
+                couchbaseCollection.insert(req.body.email, account, (error, result) => {
+                    if (error) {
+                        return res.status(500).send({});
+                    }
+                    res.send(result);
+                });
             }
-            res.send(result);
-        });
+        })
+        
     }
 
-    login(req,res) {
-        if (!req.body.email) {
-            return res.status(401).send({ "message": "An `email` is required" })
-        } else if (!req.body.password) {
-            return res.status(401).send({ "message": "A `password` is required" })
-        }
+    /**
+     * login
+     * @param {request} req request data 
+     * @param {Response} res response Token
+     */
+    login(req, res) {
 
         couchbaseCollection.get(req.body.email,(error,account) =>{
-            console.log(account.content.User_Id);
+            
             if(error) {
-                return response.status(500).send({ code: error.code, message: error.message });
+                return res.status(500).send({ code: error.code, message: error.message });
             }
             Bcrypt.compare(req.body.password,account.value.password ,(error,result)=>{
                 if(error || !result) {
-                    return response.status(401).send({ "success": false, "message": "Invalid username and password" });
+                    return res.status(401).send({ "success": false, "message": "Invalid username and password" });
                 }
-                let token = JsonWebToken.sign(account.content.User_Id, process.env.JWT_SECRET);
+                const json = {
+                    id : account.content.User_Id,
+                    email : account.content.email
+                }
+                let token = JsonWebToken.sign(json, process.env.JWT_SECRET);
+                account.content.jwt = token;
+
+                couchbaseCollection.upsert(json.email,account.content)
                 res.send({"token": token});
+                
             })
         })
 
     }
 
-}
+    /**
+     * logout and jwt token expire
+     * @param {Request} req request data 
+     * @param {Response} res response success message
+     */
+    logout(req,res){
+        couchbaseCollection.get(req.token.email,(error,result)=>{
+            delete result.content.jwt;
+            couchbaseCollection.upsert(req.token.email,result.content);
+        });
+        res.send({"message" : "logOut success"})
+    }
 
+}
 
 const authObj = new Auth();
 module.exports.auth = authObj;
