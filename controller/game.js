@@ -104,15 +104,12 @@ class SlotGame {
      * set response freeSpin
      * @returns free spin details [numberOfFreespins, currentFreeSpin, freeSpinTriggered] 
      */
-    freeSpin(){
+    freeSpin(freeSpin , WinFreeSpinAmount ){
         let scatterOffreeSpin = {
             numberOfFreespins: freeSpin > 0 ? 5 : 0,
             remainingSpins: freeSpin,
             freeSpinTriggered: freeSpin > 0 ? 'true' : 'false',
             WinAmount : WinFreeSpinAmount
-        }
-        if(scatterOffreeSpin.remainingSpins === 0){
-            WinFreeSpinAmount = 0 ;
         }
         
         return scatterOffreeSpin;  
@@ -122,9 +119,9 @@ class SlotGame {
      * whenever free spin not occurred 
      * @returns wallet 
      */
-    debitWinAmount (xyz,betAmount){
-         this.wallet =xyz- betAmount ;
-        return this.wallet
+    debitWinAmount (wallet,betAmount){
+         wallet -= betAmount ;
+        return wallet
     }
 
     /**
@@ -151,6 +148,8 @@ class SlotGame {
             } else {
                 let wallet = reslt.content.wallet;
                 let betAmount = reslt.content.betAmount;
+                let freeSpin = reslt.content.freeSpin;
+                let WinFreeSpinAmount = reslt.content.WinFreeSpinAmount;
                 const randomNumber = this.randomInt(0,9);
                 let result =[];
 
@@ -214,7 +213,7 @@ class SlotGame {
                                 let Pay = this.paytable();
                                 let multipler = Pay[`${symbol}`][`${count}ofakind`];
                                 if(freeSpin > 0){
-                                    this.creditWinAmount(multipler,betAmount);
+                                    WinFreeSpinAmount =this.creditWinAmount(multipler,betAmount);
                                 }
                                 wallet += betAmount * multipler ;
                                 result.push({symbol,wintype : `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler})  
@@ -232,9 +231,8 @@ class SlotGame {
                 if(freeSpin != 0){
                     freeSpin--;
                 }else{
-                    //this.debitWinAmount(wallet,betAmount);
-                    wallet -= betAmount
-                    
+                    wallet = this.debitWinAmount(wallet,betAmount);
+                    WinFreeSpinAmount =0;
                 }
                 
                 //when free spin given
@@ -243,16 +241,21 @@ class SlotGame {
                     freeSpin =5 ;
                 }
 
+                let scatterOffreeSpin = this.freeSpin(freeSpin,WinFreeSpinAmount);
+                
                 reslt.content.wallet = wallet;
                 reslt.content.betAmount = betAmount;
+                reslt.content.freeSpin = freeSpin;
+                reslt.content.WinFreeSpinAmount = WinFreeSpinAmount;
                 couchbaseCollection.upsert( reslt.content.email,reslt.content);
+
                 
                 res.send({
                     viewZone  : viewZone,
                     result    : result,
                     betAmount : betAmount, 
                     wallet    : wallet,
-                    freeSpin  : this.freeSpin()
+                    freeSpin  : scatterOffreeSpin 
                 }) 
             }
         });

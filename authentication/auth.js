@@ -18,10 +18,12 @@ class Auth {
             "email": req.body.email,
             "password": Bcrypt.hashSync(req.body.password, 10),
             "wallet" : 200000,
-            "betAmount" : 100   
+            "betAmount" : 100 ,
+            "freeSpin"  : 0,
+            "WinFreeSpinAmount" : 0
         }
         couchbaseCollection.get(req.body.email,account,(err,reslt)=>{
-            if(!reslt){
+            if(reslt){
                 return res.status(401).send({ "success": false, "message": "This `Email Id` exists" });
             }else{
                 couchbaseCollection.insert(req.body.email, account, (error, result) => {
