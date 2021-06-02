@@ -30,7 +30,7 @@ class Auth {
                     if (error) {
                         return res.status(500).send({});
                     }
-                    res.send(result);
+                    res.send({"message" : "You have been registered successfully"});
                 });
             }
         })
@@ -46,8 +46,8 @@ class Auth {
 
         couchbaseCollection.get(req.body.email,(error,account) =>{
             
-            if(error) {
-                return res.status(500).send({ code: error.code, message: error.message });
+            if(!account) {
+                return res.status(500).send({"message": "User not foundPlease register first You are not registered"});
             }
             Bcrypt.compare(req.body.password,account.value.password ,(error,result)=>{
                 if(error || !result) {

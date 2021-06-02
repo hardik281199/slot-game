@@ -2,11 +2,11 @@
 const { couchbaseCollection } = require('../connection/con');
 
 // reel configurations for all 5 reels
-let arrayOfReel =  [["H1","H2","A","H4","K","WILD","J","Q","H3","SCATTER"]
-,["WILD","J","H3","H4","SCATTER","H1","H2","A","K","Q"]
-,["H4","J","H3","SCATTER","H1","H2","A","Q","K","WILD",]
-, ["SCATTER","WILD","H2","Q","J","H1","H3","A","H4","K"]
-,["J","A","H4","K","H3","H2","WILD","Q","SCATTER","H1"]];
+let arrayOfReel =  [["H1","H2","H3","H1","K","WILD","J","A","H3","SCATTER"]
+,["WILD","J","H3","H1","SCATTER","H1","H2","A","K","A"]
+,["H1","J","H3","SCATTER","H1","H2","A","J","K","WILD",]
+, ["SCATTER","WILD","H2","A","J","H1","H3","K","H1","K"]
+,["J","A","H1","K","H3","H2","WILD","A","SCATTER","H1"]];
 
 let freeSpin = 0;
 let WinFreeSpinAmount = 0;
@@ -85,16 +85,6 @@ class SlotGame {
                 "3ofakind": 5,
                 "4ofakind": 10,
                 "5ofakind": 20
-            },
-            "Q":{
-                "3ofakind": 0,
-                "4ofakind": 0,
-                "5ofakind": 0
-            },
-            "H4":{
-                "3ofakind": 0,
-                "4ofakind": 0,
-                "5ofakind": 0
             }
         }
         return payTable;
@@ -185,7 +175,7 @@ class SlotGame {
                     }            
                     matrixReelXCol.push(arrar);                      
                 } 
-                
+                console.log(matrixReelXCol);
                 let d = 0;
                 let payarray =this.payarray();
                 let sactterCount = 0;
@@ -209,7 +199,11 @@ class SlotGame {
                                 }
                                 count++;
                             }
+                            
                             if (count > 2){
+                                if (symbol === 'WILD'){
+                                    break ;
+                                }
                                 let Pay = this.paytable();
                                 let multipler = Pay[`${symbol}`][`${count}ofakind`];
                                 if(freeSpin > 0){
@@ -255,7 +249,7 @@ class SlotGame {
                     result    : result,
                     betAmount : betAmount, 
                     wallet    : wallet,
-                    freeSpin  : scatterOffreeSpin 
+                    freeSpin  : freeSpin > 0 ? scatterOffreeSpin : 0 
                 }) 
             }
         });
