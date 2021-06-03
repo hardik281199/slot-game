@@ -8,8 +8,6 @@ let arrayOfReel =  [["H1","H2","H3","H1","K","WILD","J","A","H3","SCATTER"]
 , ["SCATTER","WILD","H2","A","J","H1","H3","K","H1","K"]
 ,["J","A","H1","K","H3","H2","WILD","A","SCATTER","H1"]];
 
-let freeSpin = 0;
-let WinFreeSpinAmount = 0;
 class SlotGame {
 
     /**
@@ -94,9 +92,9 @@ class SlotGame {
      * set response freeSpin
      * @returns free spin details [numberOfFreespins, currentFreeSpin, freeSpinTriggered] 
      */
-    freeSpin(freeSpin , WinFreeSpinAmount ){
+    freeSpin(freeSpin , WinFreeSpinAmount , totalfreeSpin ){
         let scatterOffreeSpin = {
-            numberOfFreespins: freeSpin > 0 ? 5 : 0,
+            numberOfFreespins: totalfreeSpin,
             remainingSpins: freeSpin,
             freeSpinTriggered: freeSpin > 0 ? 'true' : 'false',
             WinAmount : WinFreeSpinAmount
@@ -119,7 +117,7 @@ class SlotGame {
      * @param {multipler} multipler total win amount
      * @returns in free spin count total win amount
      */
-    creditWinAmount(multipler,betAmount){
+    creditWinAmount(multipler,betAmount , WinFreeSpinAmount){
         WinFreeSpinAmount += betAmount * multipler;
 
         return WinFreeSpinAmount;
@@ -140,6 +138,8 @@ class SlotGame {
                 let betAmount = reslt.content.betAmount;
                 let freeSpin = reslt.content.freeSpin;
                 let WinFreeSpinAmount = reslt.content.WinFreeSpinAmount;
+                let totalfreeSpin = reslt.content.totalfreeSpin; 
+                
                 const randomNumber = this.randomInt(0,9);
                 let result =[];
 
@@ -179,7 +179,7 @@ class SlotGame {
                 let d = 0;
                 let payarray =this.payarray();
                 let sactterCount = 0;
-
+                
                 // in matrix check payline available 
                 for (let rowOfMatrix = 0; rowOfMatrix < matrixReelXCol.length; rowOfMatrix++) {
                     for (let rowOfPayArray = 0; rowOfPayArray < payarray.length; rowOfPayArray++) { 
@@ -207,7 +207,7 @@ class SlotGame {
                                 let Pay = this.paytable();
                                 let multipler = Pay[`${symbol}`][`${count}ofakind`];
                                 if(freeSpin > 0){
-                                    WinFreeSpinAmount =this.creditWinAmount(multipler,betAmount);
+                                    WinFreeSpinAmount =this.creditWinAmount(multipler,betAmount,WinFreeSpinAmount);
                                 }
                                 wallet += betAmount * multipler ;
                                 result.push({symbol,wintype : `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler})  
@@ -216,7 +216,7 @@ class SlotGame {
                         }
                         let checkScatter= matrixReelXCol[rowOfMatrix][rowOfPayArray];
                         //checkScatter
-                        if (checkScatter === 'SCATTER' && freeSpin === 0){
+                        if (checkScatter === 'SCATTER' ){
                             sactterCount++;
                         }
                     }
@@ -232,15 +232,23 @@ class SlotGame {
                 //when free spin given
              
                 if (sactterCount > 2) {
-                    freeSpin =5 ;
+                    if(freeSpin > 0){
+                        totalfreeSpin += 3 ;
+                        freeSpin += 3; 
+                    }else{
+                        freeSpin =5 ;
+                        totalfreeSpin = freeSpin;
+                    }
+                    
                 }
 
-                let scatterOffreeSpin = this.freeSpin(freeSpin,WinFreeSpinAmount);
+                let scatterOffreeSpin = this.freeSpin(freeSpin,WinFreeSpinAmount,totalfreeSpin);
                 
                 reslt.content.wallet = wallet;
                 reslt.content.betAmount = betAmount;
                 reslt.content.freeSpin = freeSpin;
                 reslt.content.WinFreeSpinAmount = WinFreeSpinAmount;
+                reslt.content.totalfreeSpin = totalfreeSpin;
                 couchbaseCollection.upsert( reslt.content.email,reslt.content);
 
                 

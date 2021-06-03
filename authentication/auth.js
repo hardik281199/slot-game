@@ -20,7 +20,8 @@ class Auth {
             "wallet" : 200000,
             "betAmount" : 100 ,
             "freeSpin"  : 0,
-            "WinFreeSpinAmount" : 0
+            "WinFreeSpinAmount" : 0,
+            "totalfreeSpin" : 0
         }
         couchbaseCollection.get(req.body.email,account,(err,reslt)=>{
             if(reslt){
