@@ -1,13 +1,19 @@
 const JsonWebToken = require('jsonwebtoken');
-const app = import('express');
+
 class VerifyToken {
+
+    /**
+     * the process or action of verifying the identity of a user or process.
+     * @param {Request} req request data
+     * @param {Response} res response verifying message
+     * @param {next} next if verifying action, then next event fire
+     * @returns if valid then return message either return false 
+     */
     checkToken (req,res,next){
-        // console.log(req);
+        
         var authHeader = req.headers["authorization"];
-        // console.log(app.get('goo') + " authHeader");
         if(authHeader) {
             var bearerToken = authHeader.split(" ");
-            console.log(bearerToken + " bearerToken");
             if(bearerToken.length == 2 && bearerToken[0].toLowerCase() == "bearer") {
                 JsonWebToken.verify(bearerToken[1],process.env.JWT_SECRET,(error, token) =>{
                     if(error) {
@@ -15,6 +21,7 @@ class VerifyToken {
                     }
                     req.token = token;
                     next();
+        
                 });
             } else{
                 return false;
