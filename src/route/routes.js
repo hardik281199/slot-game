@@ -10,10 +10,10 @@ module.exports = (app) => {
 
     app.post('/register', verify.credentialVerify, auth.register);
 
-    app.post('/spin', verifyToken.checkToken, slotGame.matrix);
+    app.post('/spin', verifyToken.checkToken, slotGame.gameFunction);
 
     app.post('/logOut', verifyToken.checkToken, auth.logout);
 
-    app.get('/userinfo', verifyToken.checkToken, user.userDetails)
+    app.get('/userinfo', verifyToken.checkToken, user.getUserDetailsWithPromise)
 
 }

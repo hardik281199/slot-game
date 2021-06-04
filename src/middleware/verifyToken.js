@@ -27,7 +27,7 @@ class VerifyToken {
                 return false;
             }
         } else {
-            return false;
+            return res.status(401).send({ "success": false, "message": "Invalid Authoriz" });;
         }
     }
 }

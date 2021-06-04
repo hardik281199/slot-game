@@ -20,7 +20,7 @@ class UserDetails {
         /**
          * Promise with then() & catch()
          */
-        getObject(req.body.email).then((result) => {
+        getObject(req.token.email).then((result) => {
             const wallet = result.content.wallet;
             const betAmount = result.content.betAmount;
             const freeSpin = result.content.freeSpin;
@@ -43,7 +43,7 @@ class UserDetails {
         /**
          * Promise with await
          */
-        const user = await getObject(req.body.email);
+        const user = await getObject(req.token.email);
         const wallet = user.content.wallet;
         const betAmount = user.content.betAmount;
         const freeSpin = user.content.freeSpin;
