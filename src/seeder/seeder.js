@@ -1,4 +1,6 @@
 const {getObject , upsertObject } = require('../connection/con');
+const { falshMessage } = require('../Dispatcher/responseDispatcher');
+
 class Seeder {
     gameVariable(req,res){
         const gameVariable = {
@@ -46,9 +48,11 @@ class Seeder {
 
         
         upsertObject("MyJackpot",gameVariable).then((result) =>{
-            res.send({"message" : "You have been store successfully"});
+            let response = falshMessage.resDispatch(res,'SUCCESS');
+            return response;
         }).catch(err => {
-            res.send({ message: 'You not store data,please try again' });
+            let response = falshMessage.resDispatchError(res,'UNSUCCESS');
+            return response;
         });
     }
 }
