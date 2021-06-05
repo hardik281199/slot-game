@@ -30,6 +30,35 @@ class GameHelper{
     }
 
     /**
+     * generate ViewZone
+     * @param {randomNumber} randomNumber array of randomNumber 
+     * @param {arrayOfReel} arrayOfReel arrayOfReel 
+     * @returns viewZone And Mattix OfReel
+     */
+    generateViewZone = (randomNumber,arrayOfReel) =>{
+        /**
+         * prepared json reel of viewZone
+         */
+        const viewZone = {
+            reel0: [],
+            reel1: [],
+            reel2: [],
+            reel3: [],
+            reel4: []
+        };        
+        let generatedArray = [];
+        //create view zone
+        for(let reel = 0;reel < 5;reel++){
+            for(let col = 0; col< 3; col++) {
+                const symbol = this.getSymbol(randomNumber,arrayOfReel[reel],arrayOfReel[reel].length, reel, col);
+                viewZone[`reel${reel}`].push(symbol);
+            }
+            generatedArray.push(viewZone[`reel${reel}`])
+        }
+        return {"generatedArray" : generatedArray,"viewZone" :  viewZone}
+    }
+
+    /**
      * set response freeSpin
      * @returns free spin details [numberOfFreespins, currentFreeSpin, freeSpinTriggered] 
      */

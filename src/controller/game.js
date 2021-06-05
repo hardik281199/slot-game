@@ -27,26 +27,9 @@ class SlotGame {
                     const arrayOfReel = gameVariable.content.static.arrayOfReel;
                     let result =[];
 
-                    /**
-                     * prepared json reel of viewZone
-                     */
-                    const viewZone = {
-                        reel0: [],
-                        reel1: [],
-                        reel2: [],
-                        reel3: [],
-                        reel4: []
-                    };        
-                    let generatedArray = [];
-                    
-                    //create view zone
-                    for(let reel = 0;reel < 5;reel++){
-                        for(let col = 0; col< 3; col++) {
-                            const symbol = gameHelper.getSymbol(randomNumber,arrayOfReel[reel],arrayOfReel[reel].length, reel, col);
-                            viewZone[`reel${reel}`].push(symbol);
-                        }
-                        generatedArray.push(viewZone[`reel${reel}`])
-                    }
+                    const generateViewZone = gameHelper.generateViewZone(randomNumber,arrayOfReel);
+                    const generatedArray = generateViewZone.generatedArray;
+                    const viewZone = generateViewZone.viewZone;
                     
                     //create Reel X colume matrix
                     let matrixReelXCol = [];
