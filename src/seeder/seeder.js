@@ -1,11 +1,21 @@
 const {getObject , upsertObject } = require('../connection/con');
-const { falshMessage } = require('../Dispatcher/responseDispatcher');
+const { falshMessage } = require('../dispatcher/responseDispatcher');
 
 class Seeder {
-    gameVariable(req,res){
+
+    /**
+     * static data of game
+     * @param {Request} req 
+     * @param {response} res 
+     */
+    seedGameObject(req,res){
         const gameVariable = {
             "game": "MyJackpot",
             "static": {
+                "viewZone": {
+                    "rows": 3,
+                    "columns": 5
+                },
                 "payarray": [[0,0,0,0,0],[1,1,1,1,1],[ 2,2,2,2,2],[0,0,1,2,2],[2,2,1,0,0]],
                 "payTable":{"H1": {
                             "3ofakind": 50,
@@ -46,9 +56,10 @@ class Seeder {
             }
         }
 
-        
-        upsertObject("MyJackpot",gameVariable).then((result) =>{
-            let response = falshMessage.resDispatch(res,'SUCCESS');
+        console.log("hii" + gameVariable );
+        upsertObject('MyJackpot',gameVariable).then((result) =>{
+            console.log(result  + " hii");
+            let response = falshMessage.resDispatch(res,'SUCCESS',{});
             return response;
         }).catch(err => {
             let response = falshMessage.resDispatchError(res,'UNSUCCESS');
@@ -56,3 +67,7 @@ class Seeder {
         });
     }
 }
+
+
+const seeder = new Seeder();
+seeder.seedGameObject();

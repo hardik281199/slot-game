@@ -35,7 +35,7 @@ class GameHelper{
      * @param {arrayOfReel} arrayOfReel arrayOfReel 
      * @returns viewZone And Mattix OfReel
      */
-    generateViewZone = (randomNumber,arrayOfReel) =>{
+    generateViewZone = (randomNumber,arrayOfReel,row,colume) =>{
         /**
          * prepared json reel of viewZone
          */
@@ -48,8 +48,8 @@ class GameHelper{
         };        
         let generatedArray = [];
         //create view zone
-        for(let reel = 0;reel < 5;reel++){
-            for(let col = 0; col< 3; col++) {
+        for(let reel = 0;reel < colume;reel++){
+            for(let col = 0; col< row; col++) {
                 const symbol = this.getSymbol(randomNumber,arrayOfReel[reel],arrayOfReel[reel].length, reel, col);
                 viewZone[`reel${reel}`].push(symbol);
             }

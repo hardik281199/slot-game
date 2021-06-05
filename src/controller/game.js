@@ -27,7 +27,9 @@ class SlotGame {
                     const arrayOfReel = gameVariable.content.static.arrayOfReel;
                     let result =[];
 
-                    const generateViewZone = gameHelper.generateViewZone(randomNumber,arrayOfReel);
+                    const rowData = gameVariable.content.static.viewZone.rows;
+                    const columeData = gameVariable.content.static.viewZone.columns;
+                    const generateViewZone = gameHelper.generateViewZone(randomNumber,arrayOfReel,rowData,columeData);
                     const generatedArray = generateViewZone.generatedArray;
                     const viewZone = generateViewZone.viewZone;
                     
