@@ -1,3 +1,6 @@
+
+const { falshMessage } = require('../dispatcher/responseDispatcher');
+
 class Verify{
 
     /**
@@ -14,13 +17,17 @@ class Verify{
         var emailFormat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
         const passwordFormat = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!emailFormat.exec(email)){
-            return res.status(401).send({ "message": "Please Enter valid email " })
+            let response = falshMessage.resDispatchError(res,'INVALID_EMAIL');
+            return response;
         }else if( !passwordFormat.exec(password)){
-            return res.status(401).send({ "message": "Please Enter valid password " })
+            let response = falshMessage.resDispatchError(res,'INVALID_PASSWORD');
+            return response;
         }else if (!email){
-            return res.status(401).send({ "message": "An `email` is required" })
+            let response = falshMessage.resDispatchError(res,'REQUIRE_EMAIL');
+            return response;
         }else if(!password){
-            return res.status(401).send({ "message": "A `password` is required" })
+            let response = falshMessage.resDispatchError(res,'REQUIRE_PASSWORD');
+            return response;
         }else{
             next();
         }

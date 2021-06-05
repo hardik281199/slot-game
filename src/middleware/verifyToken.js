@@ -1,4 +1,5 @@
 const JsonWebToken = require('jsonwebtoken');
+const { falshMessage } = require('../dispatcher/responseDispatcher');
 
 class VerifyToken {
 
@@ -17,7 +18,8 @@ class VerifyToken {
             if(bearerToken.length == 2 && bearerToken[0].toLowerCase() == "bearer") {
                 JsonWebToken.verify(bearerToken[1],process.env.JWT_SECRET,(error, token) =>{
                     if(error) {
-                        return res.status(401).send("Invalid authorization token");
+                        let response = falshMessage.resDispatchError(res,'FAILED_AUTHENTICATION');
+                        return response;
                     }
                     req.token = token;
                     next();
@@ -27,7 +29,8 @@ class VerifyToken {
                 return false;
             }
         } else {
-            return false;
+            let response = falshMessage.resDispatchError(res,'FAILED_AUTHENTICATION');
+            return response;
         }
     }
 }

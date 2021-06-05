@@ -1,7 +1,9 @@
 const UUID = require('uuid');
-const { couchbaseCollection } = require('../connection/con');
+const {couchbaseCollection ,getObject , upsertObject } = require('../connection/con');
 const JsonWebToken = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
+const { falshMessage } = require('../dispatcher/responseDispatcher');
+
 class Auth {
 
     /**
@@ -12,9 +14,7 @@ class Auth {
      */
     register(req, res) {
         
-        let id = UUID.v4();
         const account = {
-            "User_Id": id,
             "email": req.body.email,
             "password": Bcrypt.hashSync(req.body.password, 10),
             "wallet" : 200000,
@@ -23,15 +23,17 @@ class Auth {
             "WinFreeSpinAmount" : 0,
             "totalfreeSpin" : 0
         }
-        couchbaseCollection.get(req.body.email,account,(err,reslt)=>{
+        couchbaseCollection.get(req.body.email,(error,reslt) => {
             if(reslt){
-                return res.status(401).send({ "success": false, "message": "This `Email Id` exists" });
+                let response = falshMessage.resDispatchError(res,'EXISTS');
+                return response;
             }else{
-                couchbaseCollection.insert(req.body.email, account, (error, result) => {
-                    if (error) {
-                        return res.status(500).send({});
-                    }
-                    res.send({"message" : "You have been registered successfully"});
+                upsertObject(req.body.email, account).then((result) => {
+                    let response = falshMessage.resDispatch(res,'REGISTRATION',result);
+                    return response;
+                }).catch(err => {   
+                    let response = falshMessage.resDispatchError(res,'SOMETHING_WENT_WRONG');
+                    return response;
                 });
             }
         })
@@ -45,24 +47,28 @@ class Auth {
      */
     login(req, res) {
 
-        couchbaseCollection.get(req.body.email,(error,account) =>{
+        getObject(req.body.email).then((account) =>{
             
             if(!account) {
-                return res.status(500).send({"message": "User not foundPlease register first You are not registered"});
+                let response = falshMessage.resDispatchError(res,'FIRST_REG');
+                return response;
             }
             Bcrypt.compare(req.body.password,account.value.password ,(error,result)=>{
                 if(error || !result) {
-                    return res.status(401).send({ "success": false, "message": "Invalid username and password" });
+                    let response = falshMessage.resDispatchError(res,'INVALID');
+                    return response;
                 }
                 const json = {
-                    id : account.content.User_Id,
                     email : account.content.email
                 }
                 let token = JsonWebToken.sign(json, process.env.JWT_SECRET);
                 account.content.jwt = token;
 
-                couchbaseCollection.upsert(json.email,account.content)
-                res.send({"token": token});
+                upsertObject(json.email,account.content).then( () =>{
+                    let response = falshMessage.resDispatch(res,'USER_LOGIN',{"token": token});
+                    return response;
+                });
+                
                 
             })
         })
@@ -75,11 +81,17 @@ class Auth {
      * @param {Response} res response success message
      */
     logout(req,res){
-        couchbaseCollection.get(req.token.email,(error,result)=>{
+            getObject(req.token.email).then((result)=>{
             delete result.content.jwt;
-            couchbaseCollection.upsert(req.token.email,result.content);
+            upsertObject(req.token.email,result.content).then( () =>{
+                let response = falshMessage.resDispatch(res,'USER_LOGOUT');
+                return response;
+            }).catch(err => {
+                let response = falshMessage.resDispatchError(res,'SOMETHING_WENT_WRONG');
+                return response;
+            });
         });
-        res.send({"message" : "logOut success"})
+        
     }
 
 }

@@ -1,13 +1,7 @@
 
-const { couchbaseCollection } = require('../connection/con');
-const { gameHelper } = require('../utils/gamehelper')
-
-// // reel configurations for all 5 reels
-// let arrayOfReel =  [["H1","H2","H3","H1","K","WILD","J","A","H3","SCATTER"]
-// ,["WILD","J","H3","H1","SCATTER","H1","H2","A","K","A"]
-// ,["H1","J","H3","SCATTER","H1","H2","A","J","K","WILD",]
-// , ["SCATTER","WILD","H2","A","J","H1","H3","K","H1","K"]
-// ,["J","A","H1","K","H3","H2","WILD","A","SCATTER","H1"]];
+const { couchbaseCollection, getObject , upsertObject } = require('../connection/con');
+const { gameHelper } = require('../utils/gamehelper');
+const { falshMessage } = require('../dispatcher/responseDispatcher');
 
 class SlotGame {
 
@@ -16,12 +10,12 @@ class SlotGame {
      * @param {*} req 
      * @param {*} res 
      */
-    matrix = (req, res) => {
-        
-        couchbaseCollection.get(req.token.email,(error,reslt)=>{
+    gameFunction = (req, res) => {
+        getObject(req.token.email).then((reslt) =>{
             if (!reslt.content.jwt){
-                return res.status(401).send({ "success": false, "message": "Invalid Authoriz" });
-            } else {
+                let response = falshMessage.resDispatchError(res,'FAILED_AUTHENTICATION');
+                return response;
+            }else {
                 let wallet = reslt.content.wallet;
                 let betAmount = reslt.content.betAmount;
                 let freeSpin = reslt.content.freeSpin;
@@ -29,123 +23,133 @@ class SlotGame {
                 let totalfreeSpin = reslt.content.totalfreeSpin; 
                 
                 const randomNumber = gameHelper.randomInt(0,9);
-                let result =[];
+                getObject("MyJackpot").then((gameVariable) =>{
+                    const arrayOfReel = gameVariable.content.static.arrayOfReel;
+                    let result =[];
 
-                /**
-                 * prepared json reel of viewZone
-                 */
-                const viewZone = {
-                    reel0: [],
-                    reel1: [],
-                    reel2: [],
-                    reel3: [],
-                    reel4: []
-                };        
-                let generatedArray = [];
-                
-                //create view zone
-                for(let reel = 0;reel < 5;reel++){
-                    for(let col = 0; col< 3; col++) {
-                        const symbol = gameHelper.getSymbol(randomNumber,arrayOfReel[reel],arrayOfReel[reel].length, reel, col);
-                        viewZone[`reel${reel}`].push(symbol);
-                    }
-                    generatedArray.push(viewZone[`reel${reel}`])
-                }
-                
-                //create Reel X colume matrix
-                let matrixReelXCol = [];
-                for (let matrixCol = 0; matrixCol < 3; matrixCol++) {
-                    let arrar = [];           
+                    /**
+                     * prepared json reel of viewZone
+                     */
+                    const viewZone = {
+                        reel0: [],
+                        reel1: [],
+                        reel2: [],
+                        reel3: [],
+                        reel4: []
+                    };        
+                    let generatedArray = [];
                     
-                    for (let matrixRow = 0; matrixRow < 5; matrixRow++) {
-                        let num = generatedArray[matrixRow][matrixCol];
-                        arrar[matrixRow] = num;
-                    }            
-                    matrixReelXCol.push(arrar);                      
-                } 
-                console.log(matrixReelXCol);
-                let d = 0;
-                let payarray =gameHelper.payarray();
-                let sactterCount = 0;
-                
-                // in matrix check payline available 
-                for (let rowOfMatrix = 0; rowOfMatrix < matrixReelXCol.length; rowOfMatrix++) {
-                    for (let rowOfPayArray = 0; rowOfPayArray < payarray.length; rowOfPayArray++) { 
-                        let symbol = matrixReelXCol[rowOfMatrix][d];             
-                        let payline = payarray[rowOfPayArray];
-                        let count = 0;
-                        if(payline[0] === rowOfMatrix && symbol !== 'SCATTER'){
-                            count++;
-                            for (let element = 1; element < payline.length; element++) {
-                                if (symbol === 'WILD' && matrixReelXCol[payline[element]][element] !== 'SCATTER'){
-                                    symbol = matrixReelXCol[payline[element]][element];
-                                    count++;
-                                    continue;
-                                }
-                                if (matrixReelXCol[payline[element]][element] != 'WILD' && matrixReelXCol[payline[element]][element] != symbol){
-                                    break;
-                                }
+                    //create view zone
+                    for(let reel = 0;reel < 5;reel++){
+                        for(let col = 0; col< 3; col++) {
+                            const symbol = gameHelper.getSymbol(randomNumber,arrayOfReel[reel],arrayOfReel[reel].length, reel, col);
+                            viewZone[`reel${reel}`].push(symbol);
+                        }
+                        generatedArray.push(viewZone[`reel${reel}`])
+                    }
+                    
+                    //create Reel X colume matrix
+                    let matrixReelXCol = [];
+                    for (let matrixCol = 0; matrixCol < 3; matrixCol++) {
+                        let arrar = [];           
+                        
+                        for (let matrixRow = 0; matrixRow < 5; matrixRow++) {
+                            let num = generatedArray[matrixRow][matrixCol];
+                            arrar[matrixRow] = num;
+                        }            
+                        matrixReelXCol.push(arrar);                      
+                    } 
+                    //console.log(matrixReelXCol);
+                    let d = 0;
+                    const payarray = gameVariable.content.static.payarray;
+                    let sactterCount = 0;
+                    
+                    // in matrix check payline available 
+                    for (let rowOfMatrix = 0; rowOfMatrix < matrixReelXCol.length; rowOfMatrix++) {
+                        for (let rowOfPayArray = 0; rowOfPayArray < payarray.length; rowOfPayArray++) { 
+                            let symbol = matrixReelXCol[rowOfMatrix][d];             
+                            let payline = payarray[rowOfPayArray];
+                            let count = 0;
+                            if(payline[0] === rowOfMatrix && symbol !== 'SCATTER'){
                                 count++;
-                            }
-                            
-                            if (count > 2){
-                                if (symbol === 'WILD'){
-                                    break ;
+                                for (let element = 1; element < payline.length; element++) {
+                                    if (symbol === 'WILD' && matrixReelXCol[payline[element]][element] !== 'SCATTER'){
+                                        symbol = matrixReelXCol[payline[element]][element];
+                                        count++;
+                                        continue;
+                                    }
+                                    if (matrixReelXCol[payline[element]][element] != 'WILD' && matrixReelXCol[payline[element]][element] != symbol){
+                                        break;
+                                    }
+                                    count++;
                                 }
-                                let Pay = gameHelper.paytable();
-                                let multipler = Pay[`${symbol}`][`${count}ofakind`];
-                                if(freeSpin > 0){
-                                    WinFreeSpinAmount =gameHelper.creditWinAmount(multipler,betAmount,WinFreeSpinAmount);
+                                
+                                if (count > 2){
+                                    if (symbol === 'WILD'){
+                                        break ;
+                                    }
+                                    let Pay = gameVariable.content.static.payTable;
+                                    let multipler = Pay[`${symbol}`][`${count}ofakind`];
+                                    if(freeSpin > 0){
+                                        WinFreeSpinAmount =gameHelper.creditWinAmount(multipler,betAmount,WinFreeSpinAmount);
+                                    }
+                                    wallet += betAmount * multipler ;
+                                    result.push({symbol,wintype : `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler})  
                                 }
-                                wallet += betAmount * multipler ;
-                                result.push({symbol,wintype : `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler})  
+                                
                             }
-                            
-                        }
-                        let checkScatter= matrixReelXCol[rowOfMatrix][rowOfPayArray];
-                        //checkScatter
-                        if (checkScatter === 'SCATTER' ){
-                            sactterCount++;
+                            let checkScatter= matrixReelXCol[rowOfMatrix][rowOfPayArray];
+                            //checkScatter
+                            if (checkScatter === 'SCATTER' ){
+                                sactterCount++;
+                            }
                         }
                     }
-                }
-                // free spin counting and free spin not occurred
-                if(freeSpin != 0){
-                    freeSpin--;
-                }else{
-                    wallet = gameHelper.debitWinAmount(wallet,betAmount);
-                    WinFreeSpinAmount =0;
-                }
-                
-                //when free spin given
-             
-                if (sactterCount > 2) {
-                    if(freeSpin > 0){
-                        totalfreeSpin += 3 ;
-                        freeSpin += 3; 
+                    // free spin counting and free spin not occurred
+                    if(freeSpin != 0){
+                        freeSpin--;
                     }else{
-                        freeSpin =5 ;
-                        totalfreeSpin = freeSpin;
+                        wallet = gameHelper.debitWinAmount(wallet,betAmount);
+                        WinFreeSpinAmount =0;
                     }
                     
-                }
-
-                let scatterOffreeSpin = gameHelper.freeSpin(freeSpin,WinFreeSpinAmount,totalfreeSpin);
+                    //when free spin given
                 
-                reslt.content.wallet = wallet;
-                reslt.content.betAmount = betAmount;
-                reslt.content.freeSpin = freeSpin;
-                reslt.content.WinFreeSpinAmount = WinFreeSpinAmount;
-                reslt.content.totalfreeSpin = totalfreeSpin;
-                couchbaseCollection.upsert( reslt.content.email,reslt.content);
+                    if (sactterCount > 2) {
+                        if(freeSpin > 0){
+                            totalfreeSpin += 3 ;
+                            freeSpin += 3; 
+                        }else{
+                            freeSpin =5 ;
+                            totalfreeSpin = freeSpin;
+                        }
+                        
+                    }
 
-                
-                res.send({
-                    viewZone  : viewZone,
-                    result    : result,
-                    betAmount : betAmount, 
-                    wallet    : wallet,
-                    freeSpin  : freeSpin > 0 ? scatterOffreeSpin : 0 
+                    let scatterOffreeSpin = gameHelper.freeSpin(freeSpin,WinFreeSpinAmount,totalfreeSpin);
+                    
+                    reslt.content.wallet = wallet;
+                    reslt.content.betAmount = betAmount;
+                    reslt.content.freeSpin = freeSpin;
+                    reslt.content.WinFreeSpinAmount = WinFreeSpinAmount;
+                    reslt.content.totalfreeSpin = totalfreeSpin;
+                    couchbaseCollection.upsert( reslt.content.email,reslt.content);
+                    upsertObject(reslt.content.email,reslt.content).then(()=>{
+
+                    }).catch(err => {
+                        let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                        return response;
+                    });
+                    let data = {
+                        viewZone  : viewZone,
+                        result    : result,
+                        betAmount : betAmount, 
+                        wallet    : wallet,
+                        freeSpin  : freeSpin > 0 ? scatterOffreeSpin : 0 
+                    }
+                    let response = falshMessage.resDispatch(res,'OK',data);
+                    return response;
+                    
                 }) 
             }
         });
