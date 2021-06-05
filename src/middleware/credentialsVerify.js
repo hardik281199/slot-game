@@ -1,5 +1,5 @@
 
-const { falshMessage } = require('../Dispatcher/responseDispatcher');
+const { falshMessage } = require('../dispatcher/responseDispatcher');
 
 class Verify{
 
