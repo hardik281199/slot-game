@@ -1,5 +1,5 @@
 const { couchbaseCollection, getObject } = require('../connection/con');
-const { falshMessage } = require('../Dispatcher/responseDispatcher');
+const { falshMessage } = require('../dispatcher/responseDispatcher');
 class UserDetails {
     userDetails = (req, res) => {
         couchbaseCollection.get(req.token.email, (error, result) => {

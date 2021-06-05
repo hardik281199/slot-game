@@ -1,4 +1,8 @@
 module.exports = {
+
+    /**
+	* Response Messages
+	*/
     RES_MESSAGES: {
         OK: 'OK',
         NOT_FOUND: 'Requested resource not found on server,please try again',

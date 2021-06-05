@@ -2,7 +2,7 @@ const UUID = require('uuid');
 const {couchbaseCollection ,getObject , upsertObject } = require('../connection/con');
 const JsonWebToken = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
-const { falshMessage } = require('../Dispatcher/responseDispatcher');
+const { falshMessage } = require('../dispatcher/responseDispatcher');
 
 class Auth {
 

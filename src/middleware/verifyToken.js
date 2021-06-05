@@ -1,5 +1,5 @@
 const JsonWebToken = require('jsonwebtoken');
-const { falshMessage } = require('../Dispatcher/responseDispatcher');
+const { falshMessage } = require('../dispatcher/responseDispatcher');
 
 class VerifyToken {
 

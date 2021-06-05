@@ -1,7 +1,7 @@
 
 const { couchbaseCollection, getObject , upsertObject } = require('../connection/con');
 const { gameHelper } = require('../utils/gamehelper');
-const { falshMessage } = require('../Dispatcher/responseDispatcher');
+const { falshMessage } = require('../dispatcher/responseDispatcher');
 
 class SlotGame {
 
