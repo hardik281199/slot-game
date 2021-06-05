@@ -13,10 +13,8 @@ var coll = bucket.defaultCollection();
  * @returns return result
  */
 const getObject = (key) => {
-   console.log(key);
    return new Promise((resolve, reject) => {
       coll.get(key, (err, res) => {
-         console.log(res);
          if (err) {
             return reject(err);
          } else {
