@@ -1,4 +1,5 @@
 const { couchbaseCollection, getObject } = require('../connection/con');
+const { falshMessage } = require('../Dispatcher/responseDispatcher');
 class UserDetails {
     userDetails = (req, res) => {
         couchbaseCollection.get(req.token.email, (error, result) => {
@@ -7,12 +8,14 @@ class UserDetails {
             const freeSpin = result.content.freeSpin;
             const WinFreeSpinAmount = result.content.WinFreeSpinAmount;
 
-            res.send({
+            let data ={
                 "wallet": wallet,
                 "betAmount": betAmount,
                 "freeSpin": freeSpin,
                 "WinFreeSpinAmount": WinFreeSpinAmount
-            })
+            };
+            let response = falshMessage.resDispatch(res,'USER_DETAILS',data);
+            return response;
         });
     }
 
@@ -26,15 +29,17 @@ class UserDetails {
             const freeSpin = result.content.freeSpin;
             const WinFreeSpinAmount = result.content.WinFreeSpinAmount;
 
-            res.send({
+            let data ={
                 "wallet": wallet,
                 "betAmount": betAmount,
                 "freeSpin": freeSpin,
                 "WinFreeSpinAmount": WinFreeSpinAmount
-            })
+            };
+            let response = falshMessage.resDispatch(res,'USER_DETAILS',data);
+            return response;
         }).catch(err => {
-            console.log(err, 'User not found');
-            res.send({ message: 'User not found' });
+            let response = falshMessage.resDispatchError(res,'SOMETHING_WENT_WRONG');
+                return response;
         });
 
     }
@@ -49,12 +54,14 @@ class UserDetails {
         const freeSpin = user.content.freeSpin;
         const WinFreeSpinAmount = user.content.WinFreeSpinAmount;
 
-        res.send({
+        let data ={
             "wallet": wallet,
             "betAmount": betAmount,
             "freeSpin": freeSpin,
             "WinFreeSpinAmount": WinFreeSpinAmount
-        })
+        };
+        let response = falshMessage.resDispatch(res,'USER_DETAILS',data);
+        return response;
     }
 
 }

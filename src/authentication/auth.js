@@ -1,7 +1,9 @@
 const UUID = require('uuid');
-const {getObject , upsertObject } = require('../connection/con');
+const {couchbaseCollection ,getObject , upsertObject } = require('../connection/con');
 const JsonWebToken = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
+const { falshMessage } = require('../Dispatcher/responseDispatcher');
+
 class Auth {
 
     /**
@@ -21,14 +23,17 @@ class Auth {
             "WinFreeSpinAmount" : 0,
             "totalfreeSpin" : 0
         }
-        getObject(req.body.email).then((reslt)=>{
+        couchbaseCollection.get(req.body.email,(error,reslt) => {
             if(reslt){
-                return res.status(401).send({ "success": false, "message": "This `Email Id` exists" });
+                let response = falshMessage.resDispatchError(res,'EXISTS');
+                return response;
             }else{
-                upsertObject(req.body.email, account).then(() => {
-                    res.send({"message" : "You have been registered successfully"});
-                }).catch(err => {
-                    res.send({ message: 'You not register , please try again' });
+                upsertObject(req.body.email, account).then((result) => {
+                    let response = falshMessage.resDispatch(res,'REGISTRATION',result);
+                    return response;
+                }).catch(err => {   
+                    let response = falshMessage.resDispatchError(res,'SOMETHING_WENT_WRONG');
+                    return response;
                 });
             }
         })
@@ -45,11 +50,13 @@ class Auth {
         getObject(req.body.email).then((account) =>{
             
             if(!account) {
-                return res.status(500).send({"message": "User not foundPlease register first You are not registered"});
+                let response = falshMessage.resDispatchError(res,'FIRST_REG');
+                return response;
             }
             Bcrypt.compare(req.body.password,account.value.password ,(error,result)=>{
                 if(error || !result) {
-                    return res.status(401).send({ "success": false, "message": "Invalid username and password" });
+                    let response = falshMessage.resDispatchError(res,'INVALID');
+                    return response;
                 }
                 const json = {
                     email : account.content.email
@@ -58,7 +65,8 @@ class Auth {
                 account.content.jwt = token;
 
                 upsertObject(json.email,account.content).then( () =>{
-                    res.send({"token": token});
+                    let response = falshMessage.resDispatch(res,'USER_LOGIN',{"token": token});
+                    return response;
                 });
                 
                 
@@ -76,9 +84,11 @@ class Auth {
             getObject(req.token.email).then((result)=>{
             delete result.content.jwt;
             upsertObject(req.token.email,result.content).then( () =>{
-                res.send({"message" : "logOut success"});
+                let response = falshMessage.resDispatch(res,'USER_LOGOUT');
+                return response;
             }).catch(err => {
-                res.send({ message: 'you not logOut' });
+                let response = falshMessage.resDispatchError(res,'SOMETHING_WENT_WRONG');
+                return response;
             });
         });
         

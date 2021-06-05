@@ -1,6 +1,7 @@
 
 const { couchbaseCollection, getObject , upsertObject } = require('../connection/con');
 const { gameHelper } = require('../utils/gamehelper');
+const { falshMessage } = require('../Dispatcher/responseDispatcher');
 
 class SlotGame {
 
@@ -10,11 +11,10 @@ class SlotGame {
      * @param {*} res 
      */
     gameFunction = (req, res) => {
-        console.log();
         getObject(req.token.email).then((reslt) =>{
-            console.log(reslt.content.wallet+ ' as s');
             if (!reslt.content.jwt){
-                return res.status(401).send({ "success": false, "message": "Invalid Authoriz" });
+                let response = falshMessage.resDispatchError(res,'FAILED_AUTHENTICATION');
+                return response;
             }else {
                 let wallet = reslt.content.wallet;
                 let betAmount = reslt.content.betAmount;
@@ -24,7 +24,6 @@ class SlotGame {
                 
                 const randomNumber = gameHelper.randomInt(0,9);
                 getObject("MyJackpot").then((gameVariable) =>{
-                    console.log(gameVariable);
                     const arrayOfReel = gameVariable.content.static.arrayOfReel;
                     let result =[];
 
@@ -60,7 +59,7 @@ class SlotGame {
                         }            
                         matrixReelXCol.push(arrar);                      
                     } 
-                    console.log(matrixReelXCol);
+                    //console.log(matrixReelXCol);
                     let d = 0;
                     const payarray = gameVariable.content.static.payarray;
                     let sactterCount = 0;
@@ -138,16 +137,19 @@ class SlotGame {
                     upsertObject(reslt.content.email,reslt.content).then(()=>{
 
                     }).catch(err => {
-                        res.send({ message: 'User not found' });
+                        let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                        return response;
                     });
-                    
-                    res.send({
+                    let data = {
                         viewZone  : viewZone,
                         result    : result,
                         betAmount : betAmount, 
                         wallet    : wallet,
                         freeSpin  : freeSpin > 0 ? scatterOffreeSpin : 0 
-                    })
+                    }
+                    let response = falshMessage.resDispatch(res,'OK',data);
+                    return response;
+                    
                 }) 
             }
         });

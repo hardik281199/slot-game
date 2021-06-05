@@ -8,6 +8,5 @@ app.use(express.urlencoded({
 }));
 require('./src/route/routes')(app);
 
-console.log(process.env.PORT);
-app.listen(process.env.PORT,() => console.log('Exapress server is runing at port no :3001'));
+app.listen(process.env.PORT,() => console.log(`Exapress server is runing at port no :${process.env.PORT}`));
 module.exports = app;
