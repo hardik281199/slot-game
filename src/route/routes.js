@@ -12,7 +12,7 @@ module.exports = (app) => {
 
     app.post('/spin', verifyToken.checkToken, slotGame.gameFunction);
 
-    app.post('/logOut', verifyToken.checkToken, auth.logout);
+    app.post('/logout', verifyToken.checkToken, auth.logout);
 
     app.get('/userinfo', verifyToken.checkToken, user.getUserDetailsWithPromise)
 
