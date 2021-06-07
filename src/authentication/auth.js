@@ -3,6 +3,7 @@ const {couchbaseCollection ,getObject , upsertObject } = require('../connection/
 const JsonWebToken = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
+const { game } = require('../seeder/gamefunction')
 
 class Auth {
 
@@ -13,16 +14,7 @@ class Auth {
      * @param {*} res responce result 
      */
     register(req, res) {
-        
-        const account = {
-            "email": req.body.email,
-            "password": Bcrypt.hashSync(req.body.password, 10),
-            "wallet" : 200000,
-            "betAmount" : 100 ,
-            "freeSpin"  : 0,
-            "WinFreeSpinAmount" : 0,
-            "totalfreeSpin" : 0
-        }
+        const account = game.gameFunction(req,res);
         couchbaseCollection.get(req.body.email,(error,reslt) => {
             if(reslt){
                 let response = falshMessage.resDispatchError(res,'EXISTS');
@@ -46,9 +38,7 @@ class Auth {
      * @param {Response} res response Token
      */
     login(req, res) {
-
-        getObject(req.body.email).then((account) =>{
-            
+        getObject(req.body.email).then((account) =>{  
             if(!account) {
                 let response = falshMessage.resDispatchError(res,'FIRST_REG');
                 return response;
@@ -67,12 +57,9 @@ class Auth {
                 upsertObject(json.email,account.content).then( () =>{
                     let response = falshMessage.resDispatch(res,'USER_LOGIN',{"token": token});
                     return response;
-                });
-                
-                
+                });   
             })
         })
-
     }
 
     /**
