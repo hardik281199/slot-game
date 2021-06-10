@@ -7,7 +7,7 @@ class GameHelper{
      * @param {high} last index of reel config
      * @returns ArrayOfNumbers Ex :[1,2,3,4,5]
      */
-     randomInt = (low, high) =>{ 
+    randomInt = (low, high) =>{ 
         let numOfArry = [];
         for (let i = 0; i < 5; i++) {
             const element = Math.floor(Math.random() * (high - low + 1) + low);
@@ -31,14 +31,15 @@ class GameHelper{
 
     /**
      * generate ViewZone
-     * @param {randomNumber} randomNumber array of randomNumber 
      * @param {static} static static data  
      * @returns viewZone And Mattix OfReel
      */
-    generateViewZone=(randomNumber,sta)=>{
+    generateViewZone=(sta)=>{
         const arrayOfReel =sta.arrayOfReel;
         const row =sta.viewZone.rows;
-        const colume = sta.viewZone.columns
+        const colume = sta.viewZone.columns;           
+        const randomNumber = this.randomInt(0,9);
+
         /**
          * prepared json reel of viewZone
          */
@@ -80,14 +81,24 @@ class GameHelper{
         return matrixReelXCol; 
     }
 
+    /**
+     * check payline in matrix
+     * @param {payarray} payarray array of kind of symbole pay
+     * @param {matrix} matrixReelXCol marix of reel
+     * @param {content} content database data
+     * @param {pay} Pay paytable 
+     * @returns 
+     */
     checkPayline=(payarray,matrixReelXCol,content,Pay) =>{
         let sactterCount = 0; 
         const result =[];
-        let wallet = 0;
-        let WinFreeSpinAmount = 0
+        let wallet = content.wallet;
+        let winAmount = 0 ;
+        let WinFreeSpinAmount = content.WinFreeSpinAmount;
+        let freeSpin = content.freeSpin;
+        let totalfreeSpin = content.totalfreeSpin;
         for (let rowOfMatrix = 0; rowOfMatrix < matrixReelXCol.length; rowOfMatrix++) {
             for (let rowOfPayArray = 0; rowOfPayArray < payarray.length; rowOfPayArray++) { 
-                             
                 let payline = payarray[rowOfPayArray];
                 let countOfSym = this.countOfSymbol(matrixReelXCol,payline,rowOfMatrix);
                 let count = countOfSym.count;
@@ -96,13 +107,10 @@ class GameHelper{
                     if (symbol === 'WILD'){
                         break ;
                     }
-                    const SymbolOfResult = this.buildPayLine(count,symbol,content,Pay,payline);
-                    wallet = SymbolOfResult.wallet;
+                    let SymbolOfResult = this.buildPayLine(count,symbol,Pay,payline,content.betAmount,freeSpin,WinFreeSpinAmount);
+                    result.push({symbol: SymbolOfResult.symbol,wintype: SymbolOfResult.wintype,Payline: SymbolOfResult.Payline,WinAmount: SymbolOfResult.WinAmount});
+                    winAmount += SymbolOfResult.WinAmount;
                     WinFreeSpinAmount = SymbolOfResult.WinFreeSpinAmount;
-                    result.push({symbol: SymbolOfResult.symbol,
-                        wintype: SymbolOfResult.wintype,
-                        Payline: SymbolOfResult.Payline,
-                        WinAmount: SymbolOfResult.WinAmount})
                 }
                 let checkScatter= matrixReelXCol[rowOfMatrix][rowOfPayArray];
                 //checkScatter
@@ -111,14 +119,28 @@ class GameHelper{
                 }
             }
         }
-        return {sactterCount :sactterCount,result : result ,wallet : wallet ,WinFreeSpinAmount : WinFreeSpinAmount}
+        wallet = winAmount + wallet;
+        if (sactterCount > 2){
+            if (freeSpin === 0) {
+                freeSpin =5 ;
+                totalfreeSpin = freeSpin;
+            }
+            
+        }
+        return {sactterCount :sactterCount,result : result ,wallet : wallet ,WinFreeSpinAmount : WinFreeSpinAmount, freeSpin : freeSpin, totalfreeSpin : totalfreeSpin }
     }
 
+    /**
+     * count same symbol in matrix
+     * @param {matrixOf reel} matrixReelXCol  REEL X COLUM matrix 
+     * @param {payline} payline parray of line
+     * @param {row} rowOfMatrix matrixReelXCol row
+     * @returns count and symbol
+     */
     countOfSymbol = (matrixReelXCol,payline,rowOfMatrix) => {
         let count = 0;
         let d = 0;
         let symbol = matrixReelXCol[rowOfMatrix][d];
-                
         if(payline[0] === rowOfMatrix && symbol !== 'SCATTER'){
             count++;
             for (let element = 1; element < payline.length; element++) {
@@ -132,29 +154,37 @@ class GameHelper{
                 }
                 count++;
             }
-            
-            
         }
         return {count :count,symbol : symbol};
     }
 
-
-    buildPayLine = (count,symbol,content,Pay,payline) =>{
-        let wallet = content.wallet;
-        console.log(content.wallet + "   this is wallet");
-        let freeSpin = content.freeSpin;
-        let WinFreeSpinAmount = content.WinFreeSpinAmount;
-        let betAmount = content.betAmount;
-
+    /**
+     * calculation of match payline and return json data
+     * @param {count} count count of same symbol
+     * @param {symbol} symbol symbol
+     * @param {content} content dataBase data
+     * @param {Pay} Pay paytable
+     * @param {payline} payline payarray of line 
+     * @returns {symbol,wintype,payline,winamount,wallet,WinFreeSpinAmount}
+     */
+    buildPayLine = (count,symbol,Pay,payline,betAmount,freeSpin,WinFreeSpinAmount) =>{
         let multipler = Pay[`${symbol}`][`${count}ofakind`];
         if(freeSpin > 0){
             WinFreeSpinAmount =this.creditWinAmount(multipler,betAmount,WinFreeSpinAmount);
         }
-        wallet += betAmount * multipler;
-        return {symbol,wintype: `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler, WinFreeSpinAmount : WinFreeSpinAmount , wallet : wallet }
+        return {symbol,wintype: `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler, WinFreeSpinAmount : WinFreeSpinAmount }
     }
 
-    
+    countOfFreeSpin = (freeSpin,totalfreeSpin) =>{
+        if(freeSpin > 0){
+            totalfreeSpin += 3 ;
+            freeSpin += 3; 
+        }else{
+            freeSpin =5 ;
+            totalfreeSpin = freeSpin;
+        }      
+        return {freeSpin : freeSpin , totalfreeSpin : totalfreeSpin }
+    }
 
     /**
      * set response freeSpin
@@ -167,7 +197,6 @@ class GameHelper{
             freeSpinTriggered: freeSpin > 0 ? 'true' : 'false',
             WinAmount : WinFreeSpinAmount
         }
-        
         return scatterOffreeSpin;  
     }
 
@@ -187,7 +216,6 @@ class GameHelper{
      */
     creditWinAmount = (multipler,betAmount , WinFreeSpinAmount) => {
         WinFreeSpinAmount += betAmount * multipler;
-
         return WinFreeSpinAmount;
     }
 }
