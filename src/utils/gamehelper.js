@@ -63,6 +63,47 @@ class GameHelper{
     }
 
     /**
+     * this function check wild card and convert reel symbol in wild card 
+     * @param {ViewZone} generateViewZone generate ViewZone
+     * @returns viewZone , generatedArray , expandingWild
+    */
+    expandingWildCard = (generateViewZone) =>{
+        const viewZone = {
+            reel0: [],
+            reel1: [],
+            reel2: [],
+            reel3: [],
+            reel4: []
+        };
+        const newGenerateArray =[];
+        const expandingWild = [];
+        for(let reel = 0; reel < generateViewZone.generatedArray.length; reel++){
+            const celement = generateViewZone.generatedArray[reel];
+            const element = JSON.parse(JSON.stringify(celement));
+            const found = element.find(symbol => symbol === 'WILD');
+            if (found === 'WILD') {
+                viewZone[`reel${reel}`].push(element.fill('WILD'));
+                newGenerateArray.push(element.fill('WILD'));
+                let col = 0
+                for (col; col < generateViewZone.generatedArray[reel].length; col++) {
+                    if (generateViewZone.generatedArray[reel][col] === 'WILD') {
+                        break ;
+                    }
+                }
+                expandingWild.push({
+                    "column": reel,
+                    "row": col
+                })
+            }else{
+                viewZone[`reel${reel}`].push(element);
+                newGenerateArray.push(element);
+            }
+               
+        }
+        return {viewZone : viewZone ,generatedArray : newGenerateArray , expandingWild : expandingWild }  
+    }
+
+    /**
      * reel change in matrix
      * @param {row} row row of matrix
      * @param {colume} colume colume of matrix

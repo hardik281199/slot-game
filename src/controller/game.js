@@ -25,9 +25,10 @@ class SlotGame {
                     // Generate ViewZone
                     const generateViewZone = gameHelper.generateViewZone(gameVariable.content.static);
                     const viewZone = generateViewZone.viewZone;
+                    const expanding_Wild = gameHelper.expandingWildCard(generateViewZone);
                     
                     //create Reel X colume matrix
-                    let matrixReelXCol = gameHelper.matrix(generateViewZone,gameVariable.content.static.viewZone.rows , gameVariable.content.static.viewZone.columns)
+                    let matrixReelXCol = gameHelper.matrix(expanding_Wild,gameVariable.content.static.viewZone.rows , gameVariable.content.static.viewZone.columns)
                     //console.log(matrixReelXCol);
 
                     // in matrix check payline available 
@@ -71,7 +72,8 @@ class SlotGame {
                         result    : result,
                         betAmount : betAmount, 
                         wallet    : wallet,
-                        freeSpin  : checkPayline.freeSpin > 0 ? responceFreeSpin : 0  
+                        freeSpin  : checkPayline.freeSpin > 0 ? responceFreeSpin : 0,
+                        expandingWild : expanding_Wild.expandingWild
                     }
                     let response = falshMessage.resDispatch(res,'OK',data);
                     return response; 
