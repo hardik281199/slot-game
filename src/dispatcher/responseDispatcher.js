@@ -8,8 +8,7 @@ class Dispatcher {
      * @param {data} data response data
      * @returns true
      */
-    resDispatch(res,message,data){
-        
+    resDispatch(res,message,data){      
         let jsonResponse ={
             "isError" : true,
             "message" : RES_MESSAGES[`${message}`],
