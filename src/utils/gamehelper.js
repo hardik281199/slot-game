@@ -39,7 +39,6 @@ class GameHelper{
         const row =sta.viewZone.rows;
         const colume = sta.viewZone.columns;           
         const randomNumber = this.randomInt(0,9);
-
         /**
          * prepared json reel of viewZone
          */
@@ -53,13 +52,51 @@ class GameHelper{
         let generatedArray = [];
         //create view zone
         for(let reel = 0;reel < colume;reel++){
+            let symbolArray = [];
+            let wildCounter = 0;
             for(let col = 0; col< row; col++) {
                 const symbol = this.getSymbol(randomNumber,arrayOfReel[reel],arrayOfReel[reel].length, reel, col);
-                viewZone[`reel${reel}`].push(symbol);
+                symbolArray.push(symbol);
+                if(symbol === 'WILD'){
+                    wildCounter++;
+                }
             }
-            generatedArray.push(viewZone[`reel${reel}`])
+            if(wildCounter > 1){
+                let newSymbolArray = this.countOfWild(arrayOfReel[reel],arrayOfReel[reel].length, reel ,row);
+                viewZone[`reel${reel}`].push(...newSymbolArray);
+            }else{
+                viewZone[`reel${reel}`].push(...symbolArray);
+            }
+            generatedArray.push(viewZone[`reel${reel}`]);
         }
         return {"generatedArray" : generatedArray,"viewZone" :  viewZone}
+    }
+    
+    /**
+     * this function use where in reel 2 wild card come then replace other symbole
+     * @param {arrayOfReel} arrayOfReel arrayOfReel reel config
+     * @param {length} length length og arrayOfReel
+     * @param {reel} reel reel number
+     * @param {row} row row of viewZone
+     * @returns 
+     */
+    countOfWild(arrayOfReel,length,reel,row){
+        const randomNumber = this.randomInt(0,9);
+        let wildCounter = 0;
+        let symbolArray = [];
+        for(let col = 0; col< row; col++) {
+            const symbol = this.getSymbol(randomNumber,arrayOfReel,length, reel, col);
+            symbolArray.push(symbol);
+            if(symbol === 'WILD'){
+                wildCounter++;
+            }
+        }
+        if(wildCounter > 1){
+            this.countOfWild(arrayOfReel,length,reel),row;
+        }
+            
+        return symbolArray;
+        
     }
 
     /**
