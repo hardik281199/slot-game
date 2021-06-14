@@ -32,7 +32,7 @@ class SlotGame {
                     //console.log(matrixReelXCol);
 
                     // in matrix check payline available 
-                    let checkPayline = gameHelper.checkPayline(gameVariable.content.static.payarray,matrixReelXCol,reslt.content,gameVariable.content.static.payTable);
+                    let checkPayline = gameHelper.checkPayline(gameVariable.content.static.payarray,matrixReelXCol,reslt.content,gameVariable.content.static.payTable,expanding_Wild.wildMultipliar);
                     WinFreeSpinAmount = checkPayline.WinFreeSpinAmount;
                     wallet = checkPayline.wallet
                      // free spin counting and free spin not occurred
@@ -73,7 +73,9 @@ class SlotGame {
                         betAmount : betAmount, 
                         wallet    : wallet,
                         freeSpin  : checkPayline.freeSpin > 0 ? responceFreeSpin : 0,
-                        expandingWild : expanding_Wild.expandingWild
+                        expandingWild : expanding_Wild.expandingWild,
+                        TotalWin : checkPayline.winAmount,
+                        wildMultipliar : expanding_Wild.wildMultipliarArray
                     }
                     let response = falshMessage.resDispatch(res,'OK',data);
                     return response; 

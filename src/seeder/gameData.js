@@ -36,6 +36,11 @@ module.exports  = {
                     "3ofakind": 5,
                     "4ofakind": 10,
                     "5ofakind": 20
+                    },
+                    "SCATTER": {
+                      "3ofakind": 10,
+                      "4ofakind": 20,
+                      "5ofakind": 40
                     }
                 },
         arrayOfReel: [["H1","H2","H3","H1","K","WILD","J","A","H3","SCATTER"],
