@@ -1,4 +1,4 @@
-const {getObject , upsertObject } = require('../connection/con');
+const { upsertObject } = require('../connection/con');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
 const { gameVariable } = require('./gameData')
 
@@ -12,7 +12,7 @@ class Seeder {
     seedGameObject(req,res){
         // console.log("hii" + gameVariable );
         upsertObject('MyJackpot',gameVariable).then((result) =>{
-            console.log(result  + " hii");
+            console.log(" Game has been seeded successfully!");
             let response = falshMessage.resDispatch(res,'SUCCESS',{});
             return response;
         }).catch(err => {

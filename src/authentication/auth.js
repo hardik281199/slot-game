@@ -3,7 +3,7 @@ const {couchbaseCollection ,getObject , upsertObject } = require('../connection/
 const JsonWebToken = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
-const { game } = require('../seeder/gamefunction')
+const { game } = require('../utils/userhelper')
 
 class Auth {
 
