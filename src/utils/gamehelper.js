@@ -151,6 +151,13 @@ class GameHelper{
         return {viewZone : viewZone ,generatedArray : newGenerateArray , expandingWild : expandingWild ,wildMultipliar : wildMultipliar,wildMultipliarArray : wildMultipliarArray}  
     }
 
+    /**
+     * this function use when wild card come in view zone and send responce 
+     * @param {reel} reel 
+     * @param {row} row 
+     * @param {random} random 
+     * @returns 
+     */
     wildMult =(reel,row,random ) =>{
 
         let wildMultipliar ={
@@ -218,13 +225,11 @@ class GameHelper{
                 }
             }
         }
-        console.log(wildMultipliar);
         wallet = (winAmount * wildMultipliar )+ wallet;
         if (sactterCount > 2){
-            if (freeSpin === 0) {
-                freeSpin =5 ;
-                totalfreeSpin = freeSpin;
-            }
+            let countOfFreeSpin = this.countOfFreeSpin(freeSpin,totalfreeSpin);
+            freeSpin = countOfFreeSpin.freeSpin;
+            totalfreeSpin = countOfFreeSpin.totalfreeSpin;
             
         }
         return {sactterCount :sactterCount,result : result ,wallet : wallet ,WinFreeSpinAmount : WinFreeSpinAmount, freeSpin : freeSpin, totalfreeSpin : totalfreeSpin , winAmount : winAmount}
@@ -260,6 +265,10 @@ class GameHelper{
         return {count :count,symbol : symbol};
     }
 
+    /**
+     * this function use random Wild multipair 
+     * @returns wild multipair
+     */
     randomWildMul(){
         let wildMult = [2,4,6]
         const element = Math.floor(Math.random() * ((2-0)+ 1) + 0);
@@ -284,6 +293,12 @@ class GameHelper{
         return {symbol,wintype: `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler, WinFreeSpinAmount : WinFreeSpinAmount }
     }
 
+    /**
+     * when scatter > 2 then this function call 
+     * @param {free spin} freeSpin 
+     * @param {totalfreeSpin} totalfreeSpin 
+     * @returns free spin and total free spin
+     */
     countOfFreeSpin = (freeSpin,totalfreeSpin) =>{
         if(freeSpin > 0){
             totalfreeSpin += 3 ;
@@ -303,7 +318,7 @@ class GameHelper{
         let scatterOffreeSpin = {
             numberOfFreespins: totalfreeSpin,
             remainingSpins: freeSpin,
-            freeSpinTriggered: freeSpin > 0 ? 'true' : 'false',
+            freeSpinTriggered: freeSpin === totalfreeSpin ? 'true' : 'false',
             WinAmount : WinFreeSpinAmount
         }
         return scatterOffreeSpin;  
