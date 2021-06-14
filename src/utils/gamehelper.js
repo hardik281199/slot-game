@@ -71,7 +71,7 @@ class GameHelper{
         }
         return {"generatedArray" : generatedArray,"viewZone" :  viewZone}
     }
-    
+
     /**
      * this function use where in reel 2 wild card come then replace other symbole
      * @param {arrayOfReel} arrayOfReel arrayOfReel reel config
@@ -112,9 +112,20 @@ class GameHelper{
             reel3: [],
             reel4: []
         };
+        let wildMultipliarArray = [];
+        let wildMultipliar = 0;
         const newGenerateArray =[];
         const expandingWild = [];
         for(let reel = 0; reel < generateViewZone.generatedArray.length; reel++){
+            for (let col = 0; col < generateViewZone.generatedArray[reel].length; col++) {
+                let checkWild = generateViewZone.generatedArray[reel][col];
+                if(checkWild === 'WILD'){
+                    let random = this.randomWildMul();
+                    wildMultipliar += random;
+                    let wildResponse = this.wildMult(reel,col,random);
+                    wildMultipliarArray.push(wildResponse);
+                }
+            }
             const celement = generateViewZone.generatedArray[reel];
             const element = JSON.parse(JSON.stringify(celement));
             const found = element.find(symbol => symbol === 'WILD');
@@ -137,7 +148,17 @@ class GameHelper{
             }
                
         }
-        return {viewZone : viewZone ,generatedArray : newGenerateArray , expandingWild : expandingWild }  
+        return {viewZone : viewZone ,generatedArray : newGenerateArray , expandingWild : expandingWild ,wildMultipliar : wildMultipliar,wildMultipliarArray : wildMultipliarArray}  
+    }
+
+    wildMult =(reel,row,random ) =>{
+
+        let wildMultipliar ={
+            row : row,
+            colume : reel,
+            Multipliar:random
+        }
+        return wildMultipliar;
     }
 
     /**
@@ -167,7 +188,7 @@ class GameHelper{
      * @param {pay} Pay paytable 
      * @returns 
      */
-    checkPayline=(payarray,matrixReelXCol,content,Pay) =>{
+    checkPayline=(payarray,matrixReelXCol,content,Pay,wildMultipliar) =>{
         let sactterCount = 0; 
         const result =[];
         let wallet = content.wallet;
@@ -190,14 +211,15 @@ class GameHelper{
                     winAmount += SymbolOfResult.WinAmount;
                     WinFreeSpinAmount = SymbolOfResult.WinFreeSpinAmount;
                 }
-                let checkScatter= matrixReelXCol[rowOfMatrix][rowOfPayArray];
+                let check= matrixReelXCol[rowOfMatrix][rowOfPayArray];
                 //checkScatter
-                if (checkScatter === 'SCATTER' ){
+                if (check === 'SCATTER' ){
                     sactterCount++;
                 }
             }
         }
-        wallet = winAmount + wallet;
+        console.log(wildMultipliar);
+        wallet = (winAmount * wildMultipliar )+ wallet;
         if (sactterCount > 2){
             if (freeSpin === 0) {
                 freeSpin =5 ;
@@ -205,8 +227,10 @@ class GameHelper{
             }
             
         }
-        return {sactterCount :sactterCount,result : result ,wallet : wallet ,WinFreeSpinAmount : WinFreeSpinAmount, freeSpin : freeSpin, totalfreeSpin : totalfreeSpin }
+        return {sactterCount :sactterCount,result : result ,wallet : wallet ,WinFreeSpinAmount : WinFreeSpinAmount, freeSpin : freeSpin, totalfreeSpin : totalfreeSpin , winAmount : winAmount}
     }
+
+
 
     /**
      * count same symbol in matrix
@@ -219,10 +243,10 @@ class GameHelper{
         let count = 0;
         let d = 0;
         let symbol = matrixReelXCol[rowOfMatrix][d];
-        if(payline[0] === rowOfMatrix && symbol !== 'SCATTER'){
+        if(payline[0] === rowOfMatrix ){
             count++;
             for (let element = 1; element < payline.length; element++) {
-                if (symbol === 'WILD' && matrixReelXCol[payline[element]][element] !== 'SCATTER'){
+                if (symbol === 'WILD'){
                     symbol = matrixReelXCol[payline[element]][element];
                     count++;
                     continue;
@@ -236,6 +260,13 @@ class GameHelper{
         return {count :count,symbol : symbol};
     }
 
+    randomWildMul(){
+        let wildMult = [2,4,6]
+        const element = Math.floor(Math.random() * ((2-0)+ 1) + 0);
+        return wildMult[element];
+                          
+            
+    }
     /**
      * calculation of match payline and return json data
      * @param {count} count count of same symbol
