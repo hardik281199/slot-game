@@ -28,12 +28,20 @@ class UserDetails {
             const betAmount = result.content.betAmount;
             const freeSpin = result.content.freeSpin;
             const WinFreeSpinAmount = result.content.WinFreeSpinAmount;
+            let winInSpin = result.content.winInSpin;
+            let gamblecounter = result.content.gamblecounter;
+            let gambleWin = result.content.gambleWin;
+            let gamble_history = result.content.gamble_history;
 
             let data ={
                 "wallet": wallet,
                 "betAmount": betAmount,
                 "freeSpin": freeSpin,
-                "WinFreeSpinAmount": WinFreeSpinAmount
+                "WinFreeSpinAmount": WinFreeSpinAmount,
+                "winInSpin" : winInSpin,
+                "gamblecounter" : gamblecounter,
+                "gambleWin" : gambleWin,
+                "gamble_history " : gamble_history
             };
             let response = falshMessage.resDispatch(res,'USER_DETAILS',data);
             return response;

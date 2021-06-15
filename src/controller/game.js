@@ -20,71 +20,159 @@ class SlotGame {
                 let betAmount = reslt.content.betAmount;
                 let freeSpin = reslt.content.freeSpin;
                 let WinFreeSpinAmount = reslt.content.WinFreeSpinAmount;
-                let totalfreeSpin = reslt.content.totalfreeSpin; 
-                getObject("MyJackpot").then((gameVariable) =>{
-                    // Generate ViewZone
-                    const generateViewZone = gameHelper.generateViewZone(gameVariable.content.static);
-                    const viewZone = generateViewZone.viewZone;
-                    const expanding_Wild = gameHelper.expandingWildCard(generateViewZone);
-                    
-                    //create Reel X colume matrix
-                    let matrixReelXCol = gameHelper.matrix(expanding_Wild,gameVariable.content.static.viewZone.rows , gameVariable.content.static.viewZone.columns)
-                    //console.log(matrixReelXCol);
-
-                    // in matrix check payline available 
-                    let checkPayline = gameHelper.checkPayline(gameVariable.content.static.payarray,matrixReelXCol,reslt.content,gameVariable.content.static.payTable,expanding_Wild.wildMultipliar);
-                    WinFreeSpinAmount = checkPayline.WinFreeSpinAmount;
-                    wallet = checkPayline.wallet;
-                    let checkfreeSpin = checkPayline.freeSpin
-                     // free spin counting and free spin not occurred
-                     if(freeSpin !== 0){
-                        freeSpin--;
-                        checkfreeSpin--;
-                    }else{
-                        wallet = gameHelper.debitWinAmount(checkPayline.wallet,reslt.content.betAmount);
-                        WinFreeSpinAmount =0;
-                    }
-
-                    //when free spin given
-                    if (checkPayline.sactterCount > 2) {
-                        let countOfFreeSpin = gameHelper.countOfFreeSpin(freeSpin,totalfreeSpin);
-                        freeSpin = countOfFreeSpin.freeSpin;
-                        totalfreeSpin = countOfFreeSpin.totalfreeSpin;
-                    }
-                    let responceFreeSpin = {};
-                    if (freeSpin === 0) {
-                        responceFreeSpin = gameHelper.freeSpin(checkfreeSpin,checkPayline.WinFreeSpinAmount,totalfreeSpin);
-                    }else {
-                        responceFreeSpin = gameHelper.freeSpin(freeSpin,checkPayline.WinFreeSpinAmount,totalfreeSpin);
-                    }
-                    console.log(checkfreeSpin + "  this");
-                    let result =checkPayline.result;
-                    
-                    reslt.content.wallet = wallet;
-                    reslt.content.betAmount = betAmount;
-                    reslt.content.freeSpin = freeSpin;
-                    reslt.content.WinFreeSpinAmount = WinFreeSpinAmount;
-                    reslt.content.totalfreeSpin = totalfreeSpin;
-                    upsertObject(reslt.content.email,reslt.content).then(()=>{}).catch(err => {
-                        let response = falshMessage.resDispatchError(res,'NOT_FOUND');
-                        return response;
+                let totalfreeSpin = reslt.content.totalfreeSpin;
+                let winInSpin =reslt.content.winInSpin;
+                if(winInSpin === 0){
+                    getObject("MyJackpot").then((gameVariable) =>{
+                        // Generate ViewZone
+                        const generateViewZone = gameHelper.generateViewZone(gameVariable.content.static);
+                        const viewZone = generateViewZone.viewZone;
+                        const expanding_Wild = gameHelper.expandingWildCard(generateViewZone);
+                        
+                        //create Reel X colume matrix
+                        let matrixReelXCol = gameHelper.matrix(expanding_Wild,gameVariable.content.static.viewZone.rows , gameVariable.content.static.viewZone.columns)
+                        //console.log(matrixReelXCol);
+    
+                        // in matrix check payline available 
+                        let checkPayline = gameHelper.checkPayline(gameVariable.content.static.payarray,matrixReelXCol,reslt.content,gameVariable.content.static.payTable,expanding_Wild.wildMultipliar);
+                        WinFreeSpinAmount = checkPayline.WinFreeSpinAmount;
+                        wallet = checkPayline.wallet;
+                        winInSpin = checkPayline.winAmount;
+                        let checkfreeSpin = checkPayline.freeSpin
+                         // free spin counting and free spin not occurred
+                         if(freeSpin !== 0){
+                            freeSpin--;
+                            checkfreeSpin--;
+                        }else{
+                            wallet = gameHelper.debitWinAmount(checkPayline.wallet,reslt.content.betAmount);
+                            WinFreeSpinAmount =0;
+                        }
+    
+                        //when free spin given
+                        if (checkPayline.sactterCount > 2) {
+                            let countOfFreeSpin = gameHelper.countOfFreeSpin(freeSpin,totalfreeSpin);
+                            freeSpin = countOfFreeSpin.freeSpin;
+                            totalfreeSpin = countOfFreeSpin.totalfreeSpin;
+                        }
+                        let responceFreeSpin = {};
+                        if (freeSpin === 0) {
+                            responceFreeSpin = gameHelper.freeSpin(checkfreeSpin,checkPayline.WinFreeSpinAmount,totalfreeSpin);
+                        }else {
+                            responceFreeSpin = gameHelper.freeSpin(freeSpin,checkPayline.WinFreeSpinAmount,totalfreeSpin);
+                        }
+                        let result =checkPayline.result;
+                        
+                        reslt.content.wallet = wallet;
+                        reslt.content.betAmount = betAmount;
+                        reslt.content.freeSpin = freeSpin;
+                        reslt.content.WinFreeSpinAmount = WinFreeSpinAmount;
+                        reslt.content.totalfreeSpin = totalfreeSpin;
+                        reslt.content.winInSpin = winInSpin;
+                        upsertObject(reslt.content.email,reslt.content).then(()=>{}).catch(err => {
+                            let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                            return response;
+                        });
+                        let data = {
+                            viewZone  : viewZone,
+                            result    : result,
+                            betAmount : betAmount, 
+                            wallet    : wallet,
+                            freeSpin  : checkPayline.freeSpin > 0 ? responceFreeSpin : 0,
+                            expandingWild : expanding_Wild.expandingWild,
+                            TotalWin : checkPayline.winAmount,
+                            wildMultipliar : expanding_Wild.wildMultipliarArray
+                        }
+                        let response = falshMessage.resDispatch(res,'OK',data);
+                        return response; 
                     });
-                    let data = {
-                        viewZone  : viewZone,
-                        result    : result,
-                        betAmount : betAmount, 
-                        wallet    : wallet,
-                        freeSpin  : checkPayline.freeSpin > 0 ? responceFreeSpin : 0,
-                        expandingWild : expanding_Wild.expandingWild,
-                        TotalWin : checkPayline.winAmount,
-                        wildMultipliar : expanding_Wild.wildMultipliarArray
-                    }
-                    let response = falshMessage.resDispatch(res,'OK',data);
-                    return response; 
-                }) 
+                }else{
+                    let response = falshMessage.resDispatchError(res,'GAMBLE_ERROR');
+                    return response;
+                }
             }
-        });
-                   
+        });            
+    }
+
+    /**
+     * counting gamble 
+     * @param {req} req 
+     * @param {res} res 
+     */
+    gameble =(req,res) =>{
+        getObject(req.token.email).then((result) =>{
+            let winInSpin = result.content.winInSpin;
+            let gamblecounter = result.content.gamblecounter; 
+            let gambleWin = result.content.gambleWin;
+            let gamble_history = result.content.gamble_history;
+            if (result.content.winInSpin !== 0) {
+                let gambleResponse = gameHelper.conutGamble(req,result);
+                winInSpin = gambleResponse.winInSpin;
+                gamblecounter = gambleResponse.gamblecounter;
+                gambleWin = gambleResponse.gambleWin;
+                gamble_history = gambleResponse.gamble_history;
+
+                result.content.gamble_history = gamble_history;
+                result.content.winInSpin = winInSpin ;
+                result.content.gamblecounter = gamblecounter;
+                result.content.gambleWin = gambleWin;
+                upsertObject(result.content.email,result.content).then(()=>{}).catch(err => {
+                    let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                    return response;
+                });
+
+                let data ={
+                    gamblecounter : gambleResponse.gamblecounter,
+                    GambleWon : gambleResponse.winInSpin ==0 ? false : true,
+                    winInSpin : gambleResponse.winInSpin,
+                    gambleWin : gambleResponse.gambleWin,
+                    gamble_history : gambleResponse.gamble_history
+                }
+                let response = falshMessage.resDispatch(res,'OK',data);
+                return response;
+            }else{
+                let response = falshMessage.resDispatchError(res,'GAMBLE_RES');
+                return response;
+            }
+            
+        })
+    }
+
+    /**
+     * collect win amount
+     * @param {Request} req 
+     * @param {response} res 
+     */
+    collect =(req,res) =>{
+        getObject(req.token.email).then((result) =>{
+            let wallet = result.content.wallet;
+            let winInSpin = result.content.winInSpin;
+            let gamblecounter = result.content.gamblecounter;
+            if (result.content.winInSpin !== 0) {
+                
+                let collectWallet = gameHelper.collectWallet(result);
+                wallet = collectWallet.wallet;
+                winInSpin = collectWallet.winInSpin;
+                gamblecounter = collectWallet.gamblecounter;
+
+                result.content.winInSpin = winInSpin;
+                result.content.wallet = collectWallet.wallet;
+                result.content.gamblecounter = collectWallet.gamblecounter;
+                upsertObject(result.content.email,result.content).then(()=>{}).catch(err => {
+                    let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                    return response;
+                });
+
+                let data ={
+                    wallet : wallet,
+                    gambleWin : collectWallet.gambleWin > 0 ? true : false
+                }
+                let response = falshMessage.resDispatch(res,'OK',data);
+                return response;
+            }else{
+                let response = falshMessage.resDispatchError(res,'COLLECT_RES');
+                return response;
+            }
+        })
     }
 }
 

@@ -225,7 +225,6 @@ class GameHelper{
                 }
             }
         }
-        wallet = (winAmount * wildMultipliar )+ wallet;
         if (sactterCount > 2){
             let countOfFreeSpin = this.countOfFreeSpin(freeSpin,totalfreeSpin);
             freeSpin = countOfFreeSpin.freeSpin;
@@ -273,9 +272,8 @@ class GameHelper{
         let wildMult = [2,4,6]
         const element = Math.floor(Math.random() * ((2-0)+ 1) + 0);
         return wildMult[element];
-                          
-            
     }
+
     /**
      * calculation of match payline and return json data
      * @param {count} count count of same symbol
@@ -341,6 +339,63 @@ class GameHelper{
     creditWinAmount = (multipler,betAmount , WinFreeSpinAmount) => {
         WinFreeSpinAmount += betAmount * multipler;
         return WinFreeSpinAmount;
+    }
+
+    /**
+     * random generates gamble Card 
+     * @param {low} low 
+     * @param {high} high 
+     * @returns card
+     */
+    randomGambleCard = (low,high)=>{
+        let gambleCard = ["black","red"];
+        const element = Math.floor(Math.random() * ((high-low)+ 1) + low);
+        return gambleCard[element];
+    }
+
+    /**
+     * this function use where user play gamble.
+     * @param {req} req 
+     * @param {result} result 
+     * @returns gamblecounter,gambleWin,winInSpin
+     */
+    conutGamble = (req,result) => { 
+        let winInSpin = result.content.winInSpin;
+        let gamblecounter = result.content.gamblecounter;
+        let gambleWin = result.content.gambleWin;
+        let gamble_history = result.content.gamble_history;
+        let gambleCard = this.randomGambleCard(0,1);
+        if(req.body.card ===gambleCard){
+            gamblecounter += 1;
+            gambleWin = winInSpin;
+            winInSpin = winInSpin *2;
+            gamble_history.push(gambleCard);
+        }else{
+            gamblecounter = 0;
+            gambleWin = 0;
+            gamble_history = [];
+            winInSpin = 0;
+        }
+        return {gambleWin : gambleWin,winInSpin : winInSpin , gamblecounter : gamblecounter,gamble_history : gamble_history }
+    }
+
+    /**
+     * this function used collect win amount
+     * @param {result} result 
+     * @returns 
+     */
+    collectWallet = (result) =>{
+        let wallet = result.content.wallet;
+        let winInSpin = result.content.winInSpin;
+        let gamblecounter = result.content.gamblecounter;
+        let gambleWin = result.content.gambleWin;
+        wallet = wallet + winInSpin;
+        if(gambleWin > 0 ){
+            gamblecounter = 0;
+            gambleWin = 0;
+        }
+        winInSpin = 0
+        return { wallet : wallet ,winInSpin : winInSpin , gamblecounter : gamblecounter , gambleWin : gambleWin}
     }
 }
 
