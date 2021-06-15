@@ -15,7 +15,11 @@ class GameFunction{
             betAmount: 100 ,
             freeSpin: 0,
             WinFreeSpinAmount: 0,
-            totalfreeSpin: 0
+            totalfreeSpin: 0,
+            winInSpin : 0,
+            gamblecounter : 0,
+            gambleWin :0,
+            gamble_history :[]
         }
         return account;
     }

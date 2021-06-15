@@ -14,6 +14,10 @@ module.exports = (app) => {
 
     app.post('/logout', verifyToken.checkToken, auth.logout);
 
-    app.get('/userinfo', verifyToken.checkToken, user.getUserDetailsWithPromise)
+    app.get('/userinfo', verifyToken.checkToken, user.getUserDetailsWithPromise);
+
+    app.post('/gamble', verifyToken.checkToken,slotGame.gameble);
+
+    app.post('/collect', verifyToken.checkToken,slotGame.collect)
 
 }
