@@ -16,6 +16,7 @@ class GameFunction{
             freeSpin: 0,
             WinFreeSpinAmount: 0,
             totalfreeSpin: 0,
+            wildMultipliar : 0,
             winInSpin : 0,
             gamblecounter : 0,
             gambleWin :0,

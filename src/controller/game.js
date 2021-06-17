@@ -22,19 +22,19 @@ class SlotGame {
                 let WinFreeSpinAmount = reslt.content.WinFreeSpinAmount;
                 let totalfreeSpin = reslt.content.totalfreeSpin;
                 let winInSpin =reslt.content.winInSpin;
+                let wildMultipliar =reslt.content.wildMultipliar;
                 if(winInSpin === 0){
                     getObject("MyJackpot").then((gameVariable) =>{
                         // Generate ViewZone
                         const generateViewZone = gameHelper.generateViewZone(gameVariable.content.static);
                         const viewZone = generateViewZone.viewZone;
                         const expanding_Wild = gameHelper.expandingWildCard(generateViewZone);
-                        
+                        wildMultipliar = expanding_Wild.wildMultipliar;
                         //create Reel X colume matrix
                         let matrixReelXCol = gameHelper.matrix(expanding_Wild,gameVariable.content.static.viewZone.rows , gameVariable.content.static.viewZone.columns)
-                        //console.log(matrixReelXCol);
     
                         // in matrix check payline available 
-                        let checkPayline = gameHelper.checkPayline(gameVariable.content.static.payarray,matrixReelXCol,reslt.content,gameVariable.content.static.payTable,expanding_Wild.wildMultipliar);
+                        let checkPayline = gameHelper.checkPayline(gameVariable.content.static.payarray,matrixReelXCol,reslt.content,gameVariable.content.static.payTable,expanding_Wild.checkDevil);
                         WinFreeSpinAmount = checkPayline.WinFreeSpinAmount;
                         wallet = checkPayline.wallet;
                         winInSpin = checkPayline.winAmount;
@@ -68,6 +68,7 @@ class SlotGame {
                         reslt.content.WinFreeSpinAmount = WinFreeSpinAmount;
                         reslt.content.totalfreeSpin = totalfreeSpin;
                         reslt.content.winInSpin = winInSpin;
+                        reslt.content.wildMultipliar = wildMultipliar
                         upsertObject(reslt.content.email,reslt.content).then(()=>{}).catch(err => {
                             let response = falshMessage.resDispatchError(res,'NOT_FOUND');
                             return response;
@@ -103,6 +104,7 @@ class SlotGame {
             let winInSpin = result.content.winInSpin;
             let gamblecounter = result.content.gamblecounter; 
             let gambleWin = result.content.gambleWin;
+            let gamble_amount = result.content.gamble_amount;
             let gamble_history = result.content.gamble_history;
             if (result.content.winInSpin !== 0) {
                 let gambleResponse = gameHelper.conutGamble(req,result);
@@ -110,25 +112,33 @@ class SlotGame {
                 gamblecounter = gambleResponse.gamblecounter;
                 gambleWin = gambleResponse.gambleWin;
                 gamble_history = gambleResponse.gamble_history;
+                gamble_amount = gambleResponse.gamble_amount;
+                getObject("MyJackpot").then((gameVariable) =>{
+                    if(gameVariable.content.static.maxWinAmount >= winInSpin){
 
-                result.content.gamble_history = gamble_history;
-                result.content.winInSpin = winInSpin ;
-                result.content.gamblecounter = gamblecounter;
-                result.content.gambleWin = gambleWin;
-                upsertObject(result.content.email,result.content).then(()=>{}).catch(err => {
-                    let response = falshMessage.resDispatchError(res,'NOT_FOUND');
-                    return response;
+                        result.content.gamble_history = gamble_history;
+                        result.content.winInSpin = winInSpin ;
+                        result.content.gamblecounter = gamblecounter;
+                        result.content.gambleWin = gambleWin;
+                        upsertObject(result.content.email,result.content).then(()=>{}).catch(err => {
+                            let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                            return response;
+                        });
+
+                        let data ={
+                            gamblecounter : gambleResponse.gamblecounter,
+                            GambleWinTriggered : gambleResponse.winInSpin ==0 ? false : true,
+                            winInSpin : gambleResponse.winInSpin,
+                            gambleWin : gambleResponse.gambleWin,
+                            gamble_history : gambleResponse.gamble_history
+                        }
+                        let response = falshMessage.resDispatch(res,'OK',data);
+                        return response;
+                    }else{
+                        let response = falshMessage.resDispatchError(res,'GAMBLE_FINISH');
+                        return response;
+                    } 
                 });
-
-                let data ={
-                    gamblecounter : gambleResponse.gamblecounter,
-                    GambleWon : gambleResponse.winInSpin ==0 ? false : true,
-                    winInSpin : gambleResponse.winInSpin,
-                    gambleWin : gambleResponse.gambleWin,
-                    gamble_history : gambleResponse.gamble_history
-                }
-                let response = falshMessage.resDispatch(res,'OK',data);
-                return response;
             }else{
                 let response = falshMessage.resDispatchError(res,'GAMBLE_RES');
                 return response;
@@ -147,13 +157,16 @@ class SlotGame {
             let wallet = result.content.wallet;
             let winInSpin = result.content.winInSpin;
             let gamblecounter = result.content.gamblecounter;
+            let wildMultipliar =result.content.wildMultipliar;
             if (result.content.winInSpin !== 0) {
                 
                 let collectWallet = gameHelper.collectWallet(result);
                 wallet = collectWallet.wallet;
                 winInSpin = collectWallet.winInSpin;
                 gamblecounter = collectWallet.gamblecounter;
+                wildMultipliar = collectWallet.wildMultipliar;
 
+                result.content.wildMultipliar = wildMultipliar;
                 result.content.winInSpin = winInSpin;
                 result.content.wallet = collectWallet.wallet;
                 result.content.gamblecounter = collectWallet.gamblecounter;

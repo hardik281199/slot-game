@@ -24,6 +24,7 @@ module.exports = {
         REQUIRE_PASSWORD:'A `password` is required',
         GAMBLE_ERROR :'Please first collect your pending win',
         GAMBLE_RES : 'Please first win in spin then play `gamble` ',
-        COLLECT_RES :'Please first win in spin then play `COLLECT` win amount '
+        COLLECT_RES :'Please first win in spin then play `COLLECT` win amount',
+        GAMBLE_FINISH : 'Please collect you Gamble win amount , your win finish'
     }
 }

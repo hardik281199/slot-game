@@ -38,7 +38,7 @@ class GameHelper{
         const arrayOfReel =sta.arrayOfReel;
         const row =sta.viewZone.rows;
         const colume = sta.viewZone.columns;           
-        const randomNumber = this.randomInt(0,9);
+        const randomNumber = this.randomInt(0,10);
         /**
          * prepared json reel of viewZone
          */
@@ -114,16 +114,19 @@ class GameHelper{
         };
         let wildMultipliarArray = [];
         let wildMultipliar = 0;
+        let checkDevil = [];
         const newGenerateArray =[];
         const expandingWild = [];
         for(let reel = 0; reel < generateViewZone.generatedArray.length; reel++){
             for (let col = 0; col < generateViewZone.generatedArray[reel].length; col++) {
-                let checkWild = generateViewZone.generatedArray[reel][col];
-                if(checkWild === 'WILD'){
+                let check = generateViewZone.generatedArray[reel][col];
+                if(check === 'WILD'){
                     let random = this.randomWildMul();
                     wildMultipliar += random;
                     let wildResponse = this.wildMult(reel,col,random);
                     wildMultipliarArray.push(wildResponse);
+                }if(check === 'DEVIL'){
+                    checkDevil.push(col);
                 }
             }
             const celement = generateViewZone.generatedArray[reel];
@@ -148,7 +151,7 @@ class GameHelper{
             }
                
         }
-        return {viewZone : viewZone ,generatedArray : newGenerateArray , expandingWild : expandingWild ,wildMultipliar : wildMultipliar,wildMultipliarArray : wildMultipliarArray}  
+        return {viewZone : viewZone ,generatedArray : newGenerateArray , expandingWild : expandingWild ,wildMultipliar : wildMultipliar,wildMultipliarArray : wildMultipliarArray , checkDevil : checkDevil }  
     }
 
     /**
@@ -195,7 +198,7 @@ class GameHelper{
      * @param {pay} Pay paytable 
      * @returns 
      */
-    checkPayline=(payarray,matrixReelXCol,content,Pay,wildMultipliar) =>{
+    checkPayline=(payarray,matrixReelXCol,content,Pay,checkDevil) =>{
         let sactterCount = 0; 
         const result =[];
         let wallet = content.wallet;
@@ -206,17 +209,21 @@ class GameHelper{
         for (let rowOfMatrix = 0; rowOfMatrix < matrixReelXCol.length; rowOfMatrix++) {
             for (let rowOfPayArray = 0; rowOfPayArray < payarray.length; rowOfPayArray++) { 
                 let payline = payarray[rowOfPayArray];
-                let countOfSym = this.countOfSymbol(matrixReelXCol,payline,rowOfMatrix);
-                let count = countOfSym.count;
-                let symbol = countOfSym.symbol;
-                if (count > 2){
-                    if (symbol === 'WILD'){
-                        break ;
+                let unique = [...new Set(checkDevil)];
+                const found = unique.find(symbol => symbol === payline[rowOfPayArray]);
+                if(found != payline[rowOfPayArray]){
+                    let countOfSym = this.countOfSymbol(matrixReelXCol,payline,rowOfMatrix);
+                    let count = countOfSym.count;
+                    let symbol = countOfSym.symbol;
+                    if (count > 2){
+                        if (symbol === 'WILD'){
+                            break ;
+                        }
+                        let SymbolOfResult = this.buildPayLine(count,symbol,Pay,payline,content.betAmount,freeSpin,WinFreeSpinAmount);
+                        result.push({symbol: SymbolOfResult.symbol,wintype: SymbolOfResult.wintype,Payline: SymbolOfResult.Payline,WinAmount: SymbolOfResult.WinAmount});
+                        winAmount += SymbolOfResult.WinAmount;
+                        WinFreeSpinAmount = SymbolOfResult.WinFreeSpinAmount;
                     }
-                    let SymbolOfResult = this.buildPayLine(count,symbol,Pay,payline,content.betAmount,freeSpin,WinFreeSpinAmount);
-                    result.push({symbol: SymbolOfResult.symbol,wintype: SymbolOfResult.wintype,Payline: SymbolOfResult.Payline,WinAmount: SymbolOfResult.WinAmount});
-                    winAmount += SymbolOfResult.WinAmount;
-                    WinFreeSpinAmount = SymbolOfResult.WinFreeSpinAmount;
                 }
                 let check= matrixReelXCol[rowOfMatrix][rowOfPayArray];
                 //checkScatter
@@ -233,7 +240,6 @@ class GameHelper{
         }
         return {sactterCount :sactterCount,result : result ,wallet : wallet ,WinFreeSpinAmount : WinFreeSpinAmount, freeSpin : freeSpin, totalfreeSpin : totalfreeSpin , winAmount : winAmount}
     }
-
 
 
     /**
@@ -389,13 +395,15 @@ class GameHelper{
         let winInSpin = result.content.winInSpin;
         let gamblecounter = result.content.gamblecounter;
         let gambleWin = result.content.gambleWin;
-        wallet = wallet + winInSpin;
+        let wildMultipliar =result.content.wildMultipliar;
+        wallet = wallet + (winInSpin * wildMultipliar );
         if(gambleWin > 0 ){
             gamblecounter = 0;
             gambleWin = 0;
         }
-        winInSpin = 0
-        return { wallet : wallet ,winInSpin : winInSpin , gamblecounter : gamblecounter , gambleWin : gambleWin}
+        winInSpin = 0;
+        wildMultipliar = 0;
+        return { wallet : wallet ,winInSpin : winInSpin , gamblecounter : gamblecounter , gambleWin : gambleWin , wildMultipliar : wildMultipliar}
     }
 }
 
