@@ -1,5 +1,5 @@
 
-const { couchbaseCollection, getObject , upsertObject } = require('../connection/con');
+const { getObject , upsertObject } = require('../connection/con');
 const { gameHelper } = require('../utils/gamehelper');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
 
@@ -32,12 +32,14 @@ class SlotGame {
                     //console.log(matrixReelXCol);
 
                     // in matrix check payline available 
-                    let checkPayline = gameHelper.checkPayline(gameVariable.content.static.payarray,matrixReelXCol,reslt.content,gameVariable.content.static.payTable);
+                    let checkPayline = gameHelper.checkPayline(gameVariable.content.static.payarray,matrixReelXCol,reslt.content,gameVariable.content.static.payTable,expanding_Wild.wildMultipliar);
                     WinFreeSpinAmount = checkPayline.WinFreeSpinAmount;
-                    wallet = checkPayline.wallet
+                    wallet = checkPayline.wallet;
+                    let checkfreeSpin = checkPayline.freeSpin
                      // free spin counting and free spin not occurred
                      if(freeSpin !== 0){
                         freeSpin--;
+                        checkfreeSpin--;
                     }else{
                         wallet = gameHelper.debitWinAmount(checkPayline.wallet,reslt.content.betAmount);
                         WinFreeSpinAmount =0;
@@ -51,11 +53,11 @@ class SlotGame {
                     }
                     let responceFreeSpin = {};
                     if (freeSpin === 0) {
-                        responceFreeSpin = gameHelper.freeSpin(checkPayline.freeSpin,checkPayline.WinFreeSpinAmount,checkPayline.totalfreeSpin);
+                        responceFreeSpin = gameHelper.freeSpin(checkfreeSpin,checkPayline.WinFreeSpinAmount,totalfreeSpin);
                     }else {
                         responceFreeSpin = gameHelper.freeSpin(freeSpin,checkPayline.WinFreeSpinAmount,totalfreeSpin);
                     }
-                    
+                    console.log(checkfreeSpin + "  this");
                     let result =checkPayline.result;
                     
                     reslt.content.wallet = wallet;
@@ -73,7 +75,9 @@ class SlotGame {
                         betAmount : betAmount, 
                         wallet    : wallet,
                         freeSpin  : checkPayline.freeSpin > 0 ? responceFreeSpin : 0,
-                        expandingWild : expanding_Wild.expandingWild
+                        expandingWild : expanding_Wild.expandingWild,
+                        TotalWin : checkPayline.winAmount,
+                        wildMultipliar : expanding_Wild.wildMultipliarArray
                     }
                     let response = falshMessage.resDispatch(res,'OK',data);
                     return response; 

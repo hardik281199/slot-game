@@ -1,4 +1,12 @@
+const Bcrypt = require('bcrypt');
 class GameFunction{
+
+    /**
+     * this function use where first time register user  
+     * @param {req} req 
+     * @param {res} res 
+     * @returns account detail
+     */
     gameFunction(req,res) {
         const account = {
             email: req.body.email,
@@ -9,7 +17,6 @@ class GameFunction{
             WinFreeSpinAmount: 0,
             totalfreeSpin: 0
         }
-
         return account;
     }
 }
