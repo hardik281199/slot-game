@@ -205,7 +205,7 @@ class GameHelper{
      * @param {pay} Pay paytable 
      * @returns 
      */
-    checkPayline=(payarray,matrixReelXCol,content,Pay,checkDevil) =>{
+    checkPayline=(payarray,matrixReelXCol,content,pay,checkDevil) =>{
         let sactterCount = 0; 
         const result =[];
         let wallet = content.wallet;
@@ -229,7 +229,7 @@ class GameHelper{
                             break ;
                         }
                         // payline win count
-                        let SymbolOfResult = this.buildPayLine(count,symbol,Pay,payline,content.betAmount,freeSpin,WinFreeSpinAmount);
+                        let SymbolOfResult = this.buildPayLine(count,symbol,pay,payline,content.betAmount,freeSpin,WinFreeSpinAmount);
                         result.push({symbol: SymbolOfResult.symbol,wintype: SymbolOfResult.wintype,Payline: SymbolOfResult.payline,WinAmount: SymbolOfResult.WinAmount});
                         winAmount += SymbolOfResult.WinAmount;
                         WinFreeSpinAmount = SymbolOfResult.WinFreeSpinAmount;
@@ -299,8 +299,8 @@ class GameHelper{
      * @param {payline} payline payarray of line 
      * @returns {symbol,wintype,payline,winamount,wallet,WinFreeSpinAmount}
      */
-    buildPayLine = (count,symbol,Pay,payline,betAmount,freeSpin,WinFreeSpinAmount) =>{
-        let multipler = Pay[`${symbol}`][`${count}ofakind`];
+    buildPayLine = (count,symbol,pay,payline,betAmount,freeSpin,WinFreeSpinAmount) =>{
+        let multipler = pay[`${symbol}`][`${count}ofakind`];
         if(freeSpin > 0){
             WinFreeSpinAmount =this.creditWinAmount(multipler,betAmount,WinFreeSpinAmount);
         }
