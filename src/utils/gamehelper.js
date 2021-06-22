@@ -31,6 +31,7 @@ class GameHelper{
 
     /**
      * generate ViewZone
+     * this view zone use in counting win
      * @param {static} static static data  
      * @returns viewZone And Mattix OfReel
      */
@@ -100,11 +101,12 @@ class GameHelper{
     }
 
     /**
-     * this function check wild card and convert reel symbol in wild card 
+     * this function check wild card and convert reel symbol in wild card.
+     * this function check devil card in viewzone 
      * @param {ViewZone} generateViewZone generate ViewZone
-     * @returns viewZone , generatedArray , expandingWild
+     * @returns viewZone , generatedArray , expandingWild , devil Check
     */
-    expandingWildCard = (generateViewZone) =>{
+    expandingWildCard = (generateViewZone,wildMultiArray) =>{
         const viewZone = {
             reel0: [],
             reel1: [],
@@ -121,7 +123,7 @@ class GameHelper{
             for (let col = 0; col < generateViewZone.generatedArray[reel].length; col++) {
                 let check = generateViewZone.generatedArray[reel][col];
                 if(check === 'WILD'){
-                    let random = this.randomWildMul();
+                    let random = this.randomWildMul(wildMultiArray);
                     wildMultipliar += random;
                     let wildResponse = this.wildMult(reel,col,random);
                     wildMultipliarArray.push(wildResponse);
@@ -151,7 +153,7 @@ class GameHelper{
             }
                
         }
-        return {viewZone : viewZone ,generatedArray : newGenerateArray , expandingWild : expandingWild ,wildMultipliar : wildMultipliar,wildMultipliarArray : wildMultipliarArray , checkDevil : checkDevil }  
+        return {viewZone ,generatedArray : newGenerateArray ,expandingWild ,wildMultipliar,wildMultipliarArray ,checkDevil }  
     }
 
     /**
@@ -163,12 +165,12 @@ class GameHelper{
      */
     wildMult =(reel,row,random ) =>{
 
-        let wildMultipliar ={
+        let wildMultiPliar ={
             row : row,
-            colume : reel,
-            Multipliar:random
+            column : reel,
+            MultiPliar:random
         }
-        return wildMultipliar;
+        return wildMultiPliar;
     }
 
     /**
@@ -191,7 +193,8 @@ class GameHelper{
     }
 
     /**
-     * check payline in matrix
+     * check payline in matrix.
+     * this function use when in view zone same symbole in payLine then this payline pay to use and count wallet.
      * @param {payarray} payarray array of kind of symbole pay
      * @param {matrix} matrixReelXCol marix of reel
      * @param {content} content database data
@@ -210,8 +213,10 @@ class GameHelper{
             for (let rowOfPayArray = 0; rowOfPayArray < payarray.length; rowOfPayArray++) { 
                 let payline = payarray[rowOfPayArray];
                 let unique = [...new Set(checkDevil)];
+                // check devil card
                 const found = unique.find(symbol => symbol === payline[rowOfPayArray]);
                 if(found != payline[rowOfPayArray]){
+                    // count same symbole in give payline
                     let countOfSym = this.countOfSymbol(matrixReelXCol,payline,rowOfMatrix);
                     let count = countOfSym.count;
                     let symbol = countOfSym.symbol;
@@ -219,8 +224,9 @@ class GameHelper{
                         if (symbol === 'WILD'){
                             break ;
                         }
+                        // payline win count
                         let SymbolOfResult = this.buildPayLine(count,symbol,Pay,payline,content.betAmount,freeSpin,WinFreeSpinAmount);
-                        result.push({symbol: SymbolOfResult.symbol,wintype: SymbolOfResult.wintype,Payline: SymbolOfResult.Payline,WinAmount: SymbolOfResult.WinAmount});
+                        result.push({symbol: SymbolOfResult.symbol,wintype: SymbolOfResult.wintype,Payline: SymbolOfResult.payline,WinAmount: SymbolOfResult.WinAmount});
                         winAmount += SymbolOfResult.WinAmount;
                         WinFreeSpinAmount = SymbolOfResult.WinFreeSpinAmount;
                     }
@@ -233,17 +239,18 @@ class GameHelper{
             }
         }
         if (sactterCount > 2){
+            //freespin triger then this condition call
             let countOfFreeSpin = this.countOfFreeSpin(freeSpin,totalfreeSpin);
             freeSpin = countOfFreeSpin.freeSpin;
             totalfreeSpin = countOfFreeSpin.totalfreeSpin;
             
         }
-        return {sactterCount :sactterCount,result : result ,wallet : wallet ,WinFreeSpinAmount : WinFreeSpinAmount, freeSpin : freeSpin, totalfreeSpin : totalfreeSpin , winAmount : winAmount}
+        return {sactterCount,result ,wallet ,WinFreeSpinAmount,freeSpin,totalfreeSpin,winAmount}
     }
 
 
     /**
-     * count same symbol in matrix
+     * count same symbol in matrix.
      * @param {matrixOf reel} matrixReelXCol  REEL X COLUM matrix 
      * @param {payline} payline parray of line
      * @param {row} rowOfMatrix matrixReelXCol row
@@ -253,29 +260,28 @@ class GameHelper{
         let count = 0;
         let d = 0;
         let symbol = matrixReelXCol[rowOfMatrix][d];
-        if(payline[0] === rowOfMatrix ){
+        if(payline[0] === rowOfMatrix && symbol != 'DEVIL'){
             count++;
             for (let element = 1; element < payline.length; element++) {
-                if (symbol === 'WILD'){
+                if (symbol === 'WILD' && matrixReelXCol[payline[element]][element] != 'DEVIL'){
                     symbol = matrixReelXCol[payline[element]][element];
                     count++;
                     continue;
                 }
-                if (matrixReelXCol[payline[element]][element] != 'WILD' && matrixReelXCol[payline[element]][element] != symbol){
+                if (matrixReelXCol[payline[element]][element] !== 'WILD' && matrixReelXCol[payline[element]][element] !== symbol){
                     break;
                 }
                 count++;
             }
         }
-        return {count :count,symbol : symbol};
+        return {count,symbol};
     }
 
     /**
      * this function use random Wild multipair 
      * @returns wild multipair
      */
-    randomWildMul(){
-        let wildMult = [2,4,6]
+    randomWildMul(wildMult){
         const element = Math.floor(Math.random() * ((2-0)+ 1) + 0);
         return wildMult[element];
     }
@@ -294,7 +300,7 @@ class GameHelper{
         if(freeSpin > 0){
             WinFreeSpinAmount =this.creditWinAmount(multipler,betAmount,WinFreeSpinAmount);
         }
-        return {symbol,wintype: `${count}ofakind`,Payline : payline ,WinAmount : betAmount * multipler, WinFreeSpinAmount : WinFreeSpinAmount }
+        return {symbol,wintype: `${count}ofakind`,payline ,WinAmount : betAmount * multipler,WinFreeSpinAmount }
     }
 
     /**
@@ -311,7 +317,7 @@ class GameHelper{
             freeSpin =5 ;
             totalfreeSpin = freeSpin;
         }      
-        return {freeSpin : freeSpin , totalfreeSpin : totalfreeSpin }
+        return {freeSpin ,totalfreeSpin }
     }
 
     /**
@@ -382,7 +388,7 @@ class GameHelper{
             gamble_history = [];
             winInSpin = 0;
         }
-        return {gambleWin : gambleWin,winInSpin : winInSpin , gamblecounter : gamblecounter,gamble_history : gamble_history }
+        return {gambleWin ,winInSpin ,gamblecounter,gamble_history }
     }
 
     /**
@@ -403,7 +409,7 @@ class GameHelper{
         }
         winInSpin = 0;
         wildMultipliar = 0;
-        return { wallet : wallet ,winInSpin : winInSpin , gamblecounter : gamblecounter , gambleWin : gambleWin , wildMultipliar : wildMultipliar}
+        return {wallet ,winInSpin ,gamblecounter ,gambleWin ,wildMultipliar}
     }
 }
 

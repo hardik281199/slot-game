@@ -28,7 +28,7 @@ class SlotGame {
                         // Generate ViewZone
                         const generateViewZone = gameHelper.generateViewZone(gameVariable.content.static);
                         const viewZone = generateViewZone.viewZone;
-                        const expanding_Wild = gameHelper.expandingWildCard(generateViewZone);
+                        const expanding_Wild = gameHelper.expandingWildCard(generateViewZone,gameVariable.content.static.wildMult);
                         wildMultipliar = expanding_Wild.wildMultipliar;
                         //create Reel X colume matrix
                         let matrixReelXCol = gameHelper.matrix(expanding_Wild,gameVariable.content.static.viewZone.rows , gameVariable.content.static.viewZone.columns)
