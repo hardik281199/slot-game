@@ -107,14 +107,15 @@ class SlotGame {
             let gamble_amount = result.content.gamble_amount;
             let gamble_history = result.content.gamble_history;
             if (result.content.winInSpin !== 0) {
-                let gambleResponse = gameHelper.conutGamble(req,result);
-                winInSpin = gambleResponse.winInSpin;
-                gamblecounter = gambleResponse.gamblecounter;
-                gambleWin = gambleResponse.gambleWin;
-                gamble_history = gambleResponse.gamble_history;
-                gamble_amount = gambleResponse.gamble_amount;
+                
                 getObject("MyJackpot").then((gameVariable) =>{
                     if(gameVariable.content.static.maxWinAmount >= winInSpin){
+                        let gambleResponse = gameHelper.conutGamble(req,result,gameVariable);
+                        winInSpin = gambleResponse.winInSpin;
+                        gamblecounter = gambleResponse.gamblecounter;
+                        gambleWin = gambleResponse.gambleWin;
+                        gamble_history = gambleResponse.gamble_history;
+                        gamble_amount = gambleResponse.gamble_amount;
 
                         result.content.gamble_history = gamble_history;
                         result.content.winInSpin = winInSpin ;

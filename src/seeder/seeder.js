@@ -24,4 +24,4 @@ class Seeder {
 
 
 const seeder = new Seeder();
-seeder.seedGameObject();
+module.exports.gameConfig = seeder;

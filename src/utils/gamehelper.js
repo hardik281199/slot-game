@@ -8,13 +8,9 @@ class GameHelper{
      * @returns ArrayOfNumbers Ex :[1,2,3,4,5]
      */
     randomInt = (low, high) =>{ 
-        let numOfArry = [];
-        for (let i = 0; i < 5; i++) {
-            const element = Math.floor(Math.random() * (high - low + 1) + low);
-            numOfArry.push(element);            
-        }
-        return numOfArry
-    }
+        const element = Math.floor(Math.random() * (high - low + 1) + low);
+        return element
+    } 
     
     /**
      * It returns particular symbol at requested reel & column index from reel configuration
@@ -38,8 +34,12 @@ class GameHelper{
     generateViewZone=(sta)=>{
         const arrayOfReel =sta.arrayOfReel;
         const row =sta.viewZone.rows;
-        const colume = sta.viewZone.columns;           
-        const randomNumber = this.randomInt(0,10);
+        const colume = sta.viewZone.columns;
+        const randomNumber =[];
+        for (let index = 0; index < colume; index++) {
+            const element = this.randomInt(0,arrayOfReel[index].length);
+            randomNumber.push(element);
+        }
         /**
          * prepared json reel of viewZone
          */
@@ -82,7 +82,11 @@ class GameHelper{
      * @returns 
      */
     countOfWild(arrayOfReel,length,reel,row){
-        const randomNumber = this.randomInt(0,9);
+        const randomNumber =[];
+        for (let index = 0; index < colume; index++) {
+            const element = this.randomInt(0,arrayOfReel[index].length);
+            randomNumber.push(element);
+        }
         let wildCounter = 0;
         let symbolArray = [];
         for(let col = 0; col< row; col++) {
@@ -165,12 +169,12 @@ class GameHelper{
      */
     wildMult =(reel,row,random ) =>{
 
-        let wildMultiPliar ={
+        let wildMultipliar ={
             row : row,
             column : reel,
-            MultiPliar:random
+            multipliar:random
         }
-        return wildMultiPliar;
+        return wildMultipliar;
     }
 
     /**
@@ -282,7 +286,7 @@ class GameHelper{
      * @returns wild multipair
      */
     randomWildMul(wildMult){
-        const element = Math.floor(Math.random() * ((2-0)+ 1) + 0);
+        const element = Math.floor(Math.random() * wildMult.length);
         return wildMult[element];
     }
 
@@ -359,9 +363,8 @@ class GameHelper{
      * @param {high} high 
      * @returns card
      */
-    randomGambleCard = (low,high)=>{
-        let gambleCard = ["black","red"];
-        const element = Math.floor(Math.random() * ((high-low)+ 1) + low);
+    randomGambleCard = (gambleCard)=>{
+        const element = Math.floor(Math.random() * gambleCard.length );
         return gambleCard[element];
     }
 
@@ -371,12 +374,12 @@ class GameHelper{
      * @param {result} result 
      * @returns gamblecounter,gambleWin,winInSpin
      */
-    conutGamble = (req,result) => { 
+    conutGamble = (req,result,gameVariable) => { 
         let winInSpin = result.content.winInSpin;
         let gamblecounter = result.content.gamblecounter;
         let gambleWin = result.content.gambleWin;
         let gamble_history = result.content.gamble_history;
-        let gambleCard = this.randomGambleCard(0,1);
+        let gambleCard = this.randomGambleCard(gameVariable.content.static.gambleCard);
         if(req.body.card ===gambleCard){
             gamblecounter += 1;
             gambleWin = winInSpin;
