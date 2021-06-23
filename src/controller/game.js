@@ -26,15 +26,15 @@ class SlotGame {
                 if(winInSpin === 0){
                     getObject("MyJackpot").then((gameVariable) =>{
                         // Generate ViewZone
-                        const generateViewZone = gameHelper.generateViewZone(gameVariable.content.static);
+                        const generateViewZone = gameHelper.generateViewZone(gameVariable.content);
                         const viewZone = generateViewZone.viewZone;
-                        const expanding_Wild = gameHelper.expandingWildCard(generateViewZone,gameVariable.content.static.wildMult);
+                        const expanding_Wild = gameHelper.expandingWildCard(generateViewZone,gameVariable.content.wildMult);
                         wildMultipliar = expanding_Wild.wildMultipliar;
                         //create Reel X colume matrix
-                        let matrixReelXCol = gameHelper.matrix(expanding_Wild,gameVariable.content.static.viewZone.rows , gameVariable.content.static.viewZone.columns)
+                        let matrixReelXCol = gameHelper.matrix(expanding_Wild,gameVariable.content.viewZone.rows , gameVariable.content.viewZone.columns)
     
                         // in matrix check payline available 
-                        let checkPayline = gameHelper.checkPayline(gameVariable.content.static.payarray,matrixReelXCol,reslt.content,gameVariable.content.static.payTable,expanding_Wild.checkDevil);
+                        let checkPayline = gameHelper.checkPayline(gameVariable.content.payarray,matrixReelXCol,reslt.content,gameVariable.content.payTable,expanding_Wild.checkDevil);
                         WinFreeSpinAmount = checkPayline.WinFreeSpinAmount;
                         wallet = checkPayline.wallet;
                         winInSpin = checkPayline.winAmount;
@@ -109,7 +109,7 @@ class SlotGame {
             if (result.content.winInSpin !== 0) {
                 
                 getObject("MyJackpot").then((gameVariable) =>{
-                    if(gameVariable.content.static.maxWinAmount >= winInSpin){
+                    if(gameVariable.content.maxWinAmount >= winInSpin){
                         let gambleResponse = gameHelper.conutGamble(req,result,gameVariable);
                         winInSpin = gambleResponse.winInSpin;
                         gamblecounter = gambleResponse.gamblecounter;

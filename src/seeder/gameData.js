@@ -1,7 +1,6 @@
 module.exports  = {
     gameVariable :{
         game: "MyJackpot",
-        static: {
         viewZone: {
             "rows": 3,
             "columns": 5
@@ -51,7 +50,7 @@ module.exports  = {
         maxWinAmount : 110000,
         wildMult : [2,4,6],
         gambleCard : ["black","red"]
-        }
+        
     }
     
 }

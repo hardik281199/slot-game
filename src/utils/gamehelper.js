@@ -379,7 +379,7 @@ class GameHelper{
         let gamblecounter = result.content.gamblecounter;
         let gambleWin = result.content.gambleWin;
         let gamble_history = result.content.gamble_history;
-        let gambleCard = this.randomGambleCard(gameVariable.content.static.gambleCard);
+        let gambleCard = this.randomGambleCard(gameVariable.content.gambleCard);
         if(req.body.card ===gambleCard){
             gamblecounter += 1;
             gambleWin = winInSpin;
