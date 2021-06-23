@@ -169,12 +169,12 @@ class GameHelper{
      */
     wildMult =(reel,row,random ) =>{
 
-        let wildMultipliar ={
+        let wildMultiplier ={
             row : row,
             column : reel,
-            multipliar:random
+            multiplier:random
         }
-        return wildMultipliar;
+        return wildMultiplier;
     }
 
     /**
