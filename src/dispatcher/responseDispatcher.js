@@ -10,7 +10,7 @@ class Dispatcher {
      */
     resDispatch(res,message,data){      
         let jsonResponse ={
-            "isError" : true,
+            "isError" : false,
             "message" : RES_MESSAGES[`${message}`],
             "data" :data
         }
@@ -26,7 +26,7 @@ class Dispatcher {
      */
     resDispatchError(res,message){
         let jsonResponse ={
-            "isError" : false,
+            "isError" : true,
             "message" : RES_MESSAGES[`${message}`],
             "data" : {}
         }

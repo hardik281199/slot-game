@@ -7,7 +7,7 @@ class GameFunction{
      * @param {res} res 
      * @returns account detail
      */
-    gameFunction(req,res) {
+     buildUserData(req,res) {
         const account = {
             email: req.body.email,
             password: Bcrypt.hashSync(req.body.password, 10),
@@ -25,5 +25,5 @@ class GameFunction{
         return account;
     }
 }
-const game = new GameFunction();
-module.exports.game = game ;
+const user = new GameFunction();
+module.exports.user = user ;

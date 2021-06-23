@@ -3,7 +3,7 @@ const {couchbaseCollection ,getObject , upsertObject } = require('../connection/
 const JsonWebToken = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
-const { game } = require('../utils/userhelper')
+const { user } = require('../utils/UserHelper')
 
 class Auth {
 
@@ -14,7 +14,7 @@ class Auth {
      * @param {*} res responce result 
      */
     register(req, res) {
-        const account = game.gameFunction(req,res);
+        const account = user.buildUserData(req,res);
         couchbaseCollection.get(req.body.email,(error,reslt) => {
             if(reslt){
                 let response = falshMessage.resDispatchError(res,'EXISTS');

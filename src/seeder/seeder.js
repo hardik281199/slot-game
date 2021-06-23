@@ -1,6 +1,6 @@
 const { upsertObject } = require('../connection/con');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
-const { gameVariable } = require('./gameData')
+// const { gameVariable } = require('./gameData')
 
 class Seeder {
 
@@ -10,10 +10,9 @@ class Seeder {
      * @param {response} res 
      */
     seedGameObject(req,res){
-        // console.log("hii" + gameVariable );
-        upsertObject('MyJackpot',gameVariable).then((result) =>{
-            console.log(" Game has been seeded successfully!");
-            let response = falshMessage.resDispatch(res,'SUCCESS',{});
+        const gameVariable = req.body;
+        upsertObject(req.body.gameName,gameVariable).then((result) =>{
+            let response = falshMessage.resDispatch(res,'GAME_DATA',{gameVariable});
             return response;
         }).catch(err => {
             let response = falshMessage.resDispatchError(res,'UNSUCCESS');
@@ -24,4 +23,4 @@ class Seeder {
 
 
 const seeder = new Seeder();
-seeder.seedGameObject();
+module.exports.gameConfig = seeder;

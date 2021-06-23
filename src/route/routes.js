@@ -2,7 +2,9 @@ const { slotGame } = require('../controller/game');
 const { user } = require('../controller/user');
 const { auth } = require('../authentication/auth');
 const { verifyToken } = require('../middleware/verifyToken');
-const { verify } = require('../middleware/credentialsVerify')
+const { verify } = require('../middleware/credentialsVerify');
+const { gameConfig } = require('../seeder/seeder');
+const { gameValidator } = require('../middleware/verifyAPI')
 
 module.exports = (app) => {
 
@@ -14,6 +16,12 @@ module.exports = (app) => {
 
     app.post('/logout', verifyToken.checkToken, auth.logout);
 
-    app.get('/userinfo', verifyToken.checkToken, user.getUserDetailsWithPromise)
+    app.get('/userinfo', verifyToken.checkToken, user.getUserDetailsWithPromise);
+
+    app.post('/gameConfig',gameValidator.gameConfig,gameConfig.seedGameObject);
+
+    app.post('/gamble', verifyToken.checkToken,slotGame.gameble);
+
+    app.post('/collect', verifyToken.checkToken,slotGame.collect)
 
 }

@@ -21,6 +21,12 @@ module.exports = {
         INVALID_EMAIL:'Please Enter valid email ',
         INVALID_PASSWORD:'Please Enter valid password',
         REQUIRE_EMAIL:'An `email` is required',
-        REQUIRE_PASSWORD:'A `password` is required'
+        REQUIRE_PASSWORD:'A `password` is required',
+        GAMBLE_ERROR :'Please first collect your pending win',
+        GAMBLE_RES : 'Please first win in spin then play `gamble` ',
+        COLLECT_RES :'Please first win in spin then play `COLLECT` win amount',
+        GAMBLE_FINISH : 'Please collect you Gamble win amount , your win finish',
+        GAME_DATA : 'Game has been added successfully',
+        GAME_VARIABLE_ERROR : 'this data is not valid , please check something wrong '
     }
 }
