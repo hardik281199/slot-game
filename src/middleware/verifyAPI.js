@@ -27,8 +27,7 @@ class GameValidator{
             }),
             arrayOfReel : Joi.array().items(Joi.array().items(Joi.string())).required(),
             maxWinAmount : Joi.number(),
-            wildMult : Joi.array().items(Joi.number()).required(),
-            gambleCard : Joi.array().items(Joi.string()).required()
+            wildMult : Joi.array().items(Joi.number()).required()
         })
         const result = gameConfigSchema.validate(req.body);
         if(result.error){
@@ -63,8 +62,7 @@ class GameValidator{
             }),
             arrayOfReel : Joi.array().items(Joi.array().items(Joi.string())).required(),
             maxWinAmount : Joi.number(),
-            wildMult : Joi.array().items(Joi.number()).required(),
-            gambleCard : Joi.array().items(Joi.string()).required()
+            wildMult : Joi.array().items(Joi.number()).required()
         })
         const result = gameConfigSchema.validate(req.body);
         if(result.error){
