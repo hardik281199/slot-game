@@ -20,7 +20,7 @@ module.exports = (app) => {
 
     app.post('/gameConfig',gameValidator.gameConfig,gameConfig.seedGameObject);
 
-    app.put('/gameConfig',gameValidator.editGameConfig,gameConfig.editGameObject);
+    app.put('/gameConfig/:gameName',gameValidator.editGameConfig,gameConfig.editGameObject);
 
     app.post('/gamble', verifyToken.checkToken,slotGame.gameble);
 

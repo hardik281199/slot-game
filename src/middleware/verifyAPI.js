@@ -39,7 +39,7 @@ class GameValidator{
         
     }
 
-    editGameConfig= (req,res) =>{
+    editGameConfig= (req,res,next) =>{
         const payObject = Joi.object().keys({
             "3ofakind": Joi.number().required(),
             "4ofakind": Joi.number().required(),

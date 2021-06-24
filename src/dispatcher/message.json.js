@@ -28,6 +28,7 @@ module.exports = {
         GAMBLE_FINISH : 'Please collect you Gamble win amount , your win finish',
         GAME_DATA : 'Game has been added successfully',
         GAME_VARIABLE_ERROR : 'this data is not valid , please check something wrong ',
-        GAME_EXISTS : 'This `Game` is exists'
+        GAME_EXISTS : 'This `Game` is exists',
+        GAMENAME_NOT_CHANGE : 'Game name can not edit'
     }
 }
