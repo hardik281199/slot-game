@@ -3,7 +3,7 @@ const {couchbaseCollection ,getObject , upsertObject } = require('../connection/
 const JsonWebToken = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
-const { user } = require('../utils/UserHelper')
+const { user } = require('../utils/userHelper')
 
 class Auth {
 

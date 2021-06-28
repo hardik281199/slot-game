@@ -6,14 +6,15 @@ class Mapper{
      * @param {rows} rows 
      * @returns 
      */
-    allGameConfig = (rows) =>{
-        const arrayOfGameConfig = []
+    allGameConfig = (rows , page , totalGame , perPage) =>{
+        const gameConfig = [];
+        let totalPage = Math.ceil(totalGame / perPage);
         rows.forEach(function(data) {
             let { gameName,viewZone,payarray,payTable,arrayOfReel,maxWinAmount } = data.games;
-            const gameConfig = { gameName , viewZone , payarray , payTable , arrayOfReel, maxWinAmount }
-            arrayOfGameConfig.push(gameConfig);
+            const dataOfGameConfig = { gameName , viewZone , payarray , payTable , arrayOfReel, maxWinAmount }
+            gameConfig.push(dataOfGameConfig);
         });
-        return arrayOfGameConfig;
+        return {gameConfig, page ,totalGame  , totalPage ,perPage};
     }
 
     /**
@@ -26,6 +27,7 @@ class Mapper{
         const gameConfig = { gameName , viewZone , payarray , payTable , arrayOfReel, maxWinAmount }
         return gameConfig;
     }
+
 }
 
 const map = new Mapper();

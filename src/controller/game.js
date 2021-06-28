@@ -1,6 +1,6 @@
 
 const { getObject , upsertObject } = require('../connection/con');
-const { gameHelper } = require('../utils/gamehelper');
+const { gameHelper } = require('../utils/gameHelper');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
 
 class SlotGame {

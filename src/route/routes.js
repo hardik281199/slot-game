@@ -18,13 +18,17 @@ module.exports = (app) => {
 
     app.get('/userinfo', verifyToken.checkToken, user.getUserDetailsWithPromise);
 
-    app.post('/gameConfig',gameValidator.gameConfig,gameConfig.addGameObject);
+    app.post('/games',gameValidator.gameConfig,gameConfig.addGameObject);
 
-    app.put('/gameConfig/:gameName',gameValidator.editGameConfig,gameConfig.editGameObject);
+    app.put('/games/:gameName',gameValidator.editGameConfig,gameConfig.editGameObject);
 
-    app.post('/deleteGameConfig/:gameName',gameConfig.deletGameObject);
+    app.delete('/games/:gameName',gameConfig.deletGameObject);
 
-    app.get('/allGame',gameConfig.getAllGame);
+    app.get('/games',gameConfig.getAllGame);
+
+    app.get('/games/:gameName',gameConfig.gameGame);
+
+    app.post('/allGame',gameConfig.indexing);
 
     app.post('/gamble', verifyToken.checkToken,slotGame.gameble);
 

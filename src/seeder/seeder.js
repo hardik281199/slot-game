@@ -46,7 +46,6 @@ class Seeder {
     editGameObject(req,res){
         const gameVariable = req.body;
         getObject(req.body.gameName).then((reslt) =>{
-            console.log(reslt);
             if ( req.params.gameName ===  gameVariable.gameName){
                 if(!req.body.createdAt){
                     gameVariable.updateAt = Date.now();
@@ -110,12 +109,43 @@ class Seeder {
                 let response = falshMessage.resDispatchError(res,'ERROR');
                 return response;
             }else{
-                const mapData = mapper.AllgameConfig(rows.rows);
+                const mapData = mapper.allGameConfig(rows.rows);
                 let response = falshMessage.resDispatch(res,'OK',mapData);
                 return response;
             }
         });
-     }
+    }
+
+    /**
+     * this function use to indexing game and searching the game and provide pagination all data  
+     * @param {Request} req 
+     * @param {response} res 
+     */
+    indexing = (req,res) =>{
+        let perPage = parseInt(req.query.pageSize);
+        const page = parseInt(req.query.page) || 1;
+        let offset = (page - 1) * perPage;
+        let foundGameQuary = "SELECT * FROM `slot-game` as games WHERE docType = 'game' AND deletedAt == 0 "; 
+        let countGameQuary = "SELECT COUNT(gameName) as totalGame FROM `slot-game` WHERE docType = 'game'";
+        const paginateQuery = `limit ${perPage} OFFSET ${offset}`;
+        if(req.query.gameName) {
+            countGameQuary = countGameQuary + `AND lower(gameName) like lower('%${req.query.gameName}%')`;
+            foundGameQuary = foundGameQuary + `AND lower(gameName) like lower('%${req.query.gameName}%')` + paginateQuery;
+        } else {
+            foundGameQuary = foundGameQuary + paginateQuery;
+        }
+        cluster.query(countGameQuary, (err,games) =>{
+            cluster.query(foundGameQuary,(err,result) =>{
+                let mapData = mapper.allGameConfig(result.rows , page,games.rows[0].totalGame , perPage);
+                let response = falshMessage.resDispatch(res,'OK',mapData);
+                return response;
+            })
+        })
+    }
+
+    gameGame = (req,res) =>{
+
+    }
 }
 
 
