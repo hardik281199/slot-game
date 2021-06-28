@@ -1,6 +1,12 @@
 module.exports = {
     card : [
         "black",
-        "red"
-      ]
+        "red"],
+    DBDocType : {
+        GAME : 'game',
+        USER : 'user'
+    },
+    CrudType : {
+
+    }
 }

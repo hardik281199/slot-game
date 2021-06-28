@@ -47,9 +47,7 @@ module.exports  = {
                         ["H1","J","H3","SCATTER","H1","H2","A","DEVIL","J","K","WILD"],
                         ["SCATTER","WILD","DEVIL","H2","A","J","H1","H3","K","H1","K"],
                         ["J","A","H1","K","H3","H2","DEVIL","WILD","A","SCATTER","H1"]],
-        maxWinAmount : 110000,
-        wildMult : [2,4,6]
-        
+        maxWinAmount : 110000        
     }
     
 }

@@ -18,9 +18,13 @@ module.exports = (app) => {
 
     app.get('/userinfo', verifyToken.checkToken, user.getUserDetailsWithPromise);
 
-    app.post('/gameConfig',gameValidator.gameConfig,gameConfig.seedGameObject);
+    app.post('/gameConfig',gameValidator.gameConfig,gameConfig.addGameObject);
 
     app.put('/gameConfig/:gameName',gameValidator.editGameConfig,gameConfig.editGameObject);
+
+    app.post('/deleteGameConfig/:gameName',gameConfig.deletGameObject);
+
+    app.get('/allGame',gameConfig.getAllGame);
 
     app.post('/gamble', verifyToken.checkToken,slotGame.gameble);
 

@@ -29,6 +29,11 @@ module.exports = {
         GAME_DATA : 'Game has been added successfully',
         GAME_VARIABLE_ERROR : 'this data is not valid , please check something wrong ',
         GAME_EXISTS : 'This `Game` is exists',
-        GAMENAME_NOT_CHANGE : 'Game name can not edit'
+        GAMENAME_NOT_CHANGE : 'Game name can not edit',
+        CREATEDAT_NOT_CHANGE : 'CreateAt can not edit',
+        DELETE_GAMECONFIG : 'game config deleted successfully',
+        ERROR :'some something wrong please check error',
+        ALL_READY_DELETED : 'this game allready  deleted',
+        NOT_GAME_EXISTS : 'this game not exist'
     }
 }

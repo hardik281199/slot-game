@@ -42,8 +42,10 @@ const upsertObject = (key,data) =>{
    });
 }
 
+
 module.exports = {
    couchbaseCollection: coll,
+   cluster,
    getObject, upsertObject
 };
 // export const couchbaseCollection = collection;

@@ -3,6 +3,13 @@ const { falshMessage } = require('../dispatcher/responseDispatcher');
 
 class GameValidator{
 
+    /**
+     * when game config add this middleware varify all req.body data using joi then next perform
+     * @param {Request} req 
+     * @param {Response} res 
+     * @param {next} next 
+     * @returns message
+     */
     gameConfig = (req,res,next) =>{
         const payObject = Joi.object().keys({
             "3ofakind": Joi.number().required(),
@@ -26,8 +33,7 @@ class GameValidator{
                 SCATTER: payObject
             }),
             arrayOfReel : Joi.array().items(Joi.array().items(Joi.string())).required(),
-            maxWinAmount : Joi.number(),
-            wildMult : Joi.array().items(Joi.number()).required()
+            maxWinAmount : Joi.number()
         })
         const result = gameConfigSchema.validate(req.body);
         if(result.error){
@@ -38,6 +44,13 @@ class GameValidator{
         
     }
 
+    /**
+     * when game config edit this middleware varify all req.body data using joi then next perform
+     * @param {Request} req 
+     * @param {Response} res 
+     * @param {next} next 
+     * @returns 
+     */
     editGameConfig= (req,res,next) =>{
         const payObject = Joi.object().keys({
             "3ofakind": Joi.number().required(),
@@ -62,10 +75,11 @@ class GameValidator{
             }),
             arrayOfReel : Joi.array().items(Joi.array().items(Joi.string())).required(),
             maxWinAmount : Joi.number(),
-            wildMult : Joi.array().items(Joi.number()).required()
+            docType : Joi.string().valid('game')
         })
         const result = gameConfigSchema.validate(req.body);
         if(result.error){
+            console.log(result.error);
             return falshMessage.resDispatchError(res, 'GAME_VARIABLE_ERROR');
         }else{
             return next();
