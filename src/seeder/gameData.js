@@ -1,6 +1,6 @@
 module.exports  = {
     gameVariable :{
-        game: "MyJackpot",
+        gameName: "MyJackpot",
         viewZone: {
             "rows": 3,
             "columns": 5

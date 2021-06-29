@@ -15,14 +15,14 @@ class GameValidator{
             "3ofakind": Joi.number().required(),
             "4ofakind": Joi.number().required(),
             "5ofakind": Joi.number().required()
-            });
+            }).required();
         const gameConfigSchema = Joi.object({
             gameName: Joi.string().min(3).max(15).required(),
             viewZone : Joi.object().keys({
-                rows: Joi.number().valid(3).required(),
-                columns : Joi.number().valid(5).required()
-            }),
-            payarray : Joi.array().items(Joi.array().items(Joi.number())).required(),
+                rows: Joi.number().min(3).max(6).required(),
+                columns : Joi.number().min(3).max(6).required()
+            }).required(),
+            payarray: Joi.array().items(Joi.array().items(Joi.number()).length(Joi.ref('...viewZone.columns', { render: true }))).required(),
             payTable : Joi.object().keys({
                 H1: payObject,
                 H2: payObject,
@@ -31,9 +31,10 @@ class GameValidator{
                 K: payObject,
                 J: payObject,
                 SCATTER: payObject
-            }),
-            arrayOfReel : Joi.array().items(Joi.array().items(Joi.string())).required(),
-            maxWinAmount : Joi.number()
+            }).required(),
+            arrayOfReel : Joi.array().items(Joi.array().items(Joi.string())).length(Joi.ref('viewZone.columns', { render: true })).required(),
+            maxWinAmount : Joi.number().required(),
+            docType : Joi.string().valid('game')
         })
         const result = gameConfigSchema.validate(req.body);
         if(result.error){
@@ -56,14 +57,14 @@ class GameValidator{
             "3ofakind": Joi.number().required(),
             "4ofakind": Joi.number().required(),
             "5ofakind": Joi.number().required()
-            });
+            }).required();
         const gameConfigSchema = Joi.object({
             gameName: Joi.string().min(3).max(15).required(),
             viewZone : Joi.object().keys({
-                rows: Joi.number().valid(3).required(),
-                columns : Joi.number().valid(5).required()
-            }),
-            payarray : Joi.array().items(Joi.array().items(Joi.number())).required(),
+                rows: Joi.number().min(3).max(6).required(),
+                columns : Joi.number().min(3).max(6).required()
+            }).required(),
+            payarray: Joi.array().items(Joi.array().items(Joi.number()).length(Joi.ref('...viewZone.columns', { render: true }))).required(),
             payTable : Joi.object().keys({
                 H1: payObject,
                 H2: payObject,
@@ -72,9 +73,9 @@ class GameValidator{
                 K: payObject,
                 J: payObject,
                 SCATTER: payObject
-            }),
-            arrayOfReel : Joi.array().items(Joi.array().items(Joi.string())).required(),
-            maxWinAmount : Joi.number(),
+            }).required(),
+            arrayOfReel : Joi.array().items(Joi.array().items(Joi.string())).length(Joi.ref('viewZone.columns', { render: true })).required(),
+            maxWinAmount : Joi.number().required(),
             docType : Joi.string().valid('game')
         })
         const result = gameConfigSchema.validate(req.body);

@@ -3,7 +3,7 @@ const { falshMessage } = require('../dispatcher/responseDispatcher');
 const { DBDocType } = require('../configuration/constants');
 const { mapper } = require('../mapper/game');
 
-class Seeder {
+class GameConfig{
 
     /**
      * static data of game and store data in data base 
@@ -11,7 +11,7 @@ class Seeder {
      * @param {Request} req 
      * @param {response} res 
      */
-    addGameObject(req,res){
+    addGameObject =(req,res) =>{
         const gameVariable = req.body;
         getObject(req.body.gameName).then((reslt) =>{
             if(reslt){
@@ -43,7 +43,7 @@ class Seeder {
      * @param {response} res response
      * @returns message 
      */
-    editGameObject(req,res){
+    editGameObject =(req,res) =>{
         const gameVariable = req.body;
         getObject(req.body.gameName).then((reslt) =>{
             if ( req.params.gameName ===  gameVariable.gameName){
@@ -79,7 +79,7 @@ class Seeder {
      * @param {Request} req 
      * @param {response} res 
      */
-    deletGameObject(req,res){
+    deletGameObject =(req,res) =>{
         getObject(req.params.gameName).then((result) =>{
             if(result.content.deletedAt === 0){
                 result.content.deletedAt = Date.now();
@@ -143,11 +143,10 @@ class Seeder {
         })
     }
 
-    gameGame = (req,res) =>{
+    getGame = (req,res) =>{
 
     }
 }
 
-
-const seeder = new Seeder();
-module.exports.gameConfig = seeder;
+const config = new GameConfig();
+module.exports.gameConfig = config;
