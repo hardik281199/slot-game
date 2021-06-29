@@ -34,6 +34,12 @@ class Dispatcher {
         return false;
     }
 
+    /**
+     * this function send proper response 
+     * @param {response} res 
+     * @param {data} jsonData 
+     * @returns 
+     */
     resDispatchValidationError(res,jsonData){
         res.send(jsonData);
         return false;

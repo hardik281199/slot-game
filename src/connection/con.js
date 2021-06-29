@@ -42,6 +42,11 @@ const upsertObject = (key,data) =>{
    });
 }
 
+/**
+ * connection data base && get data using N1QL
+ * @param {query} queryData 
+ * @returns 
+ */
 const couchbaseN1QLCollection = (queryData) =>{
    return new Promise((resolve , reject)=>{
       cluster.query(queryData,(err,res) =>{
