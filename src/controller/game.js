@@ -13,7 +13,7 @@ class SlotGame {
     gameFunction = (req, res) => {
         getObject(req.token.email).then((reslt) =>{
             if (!reslt.content.jwt){
-                let response = falshMessage.resDispatchError(res,'FAILED_AUTHENTICATION');
+                let response = falshMessage.resDispatchUnAuthorize(res,'FAILED_AUTHENTICATION');
                 return response;
             }else {
                 let { wallet,betAmount,freeSpin,WinFreeSpinAmount,totalfreeSpin,winInSpin,wildMultipliar } = reslt.content;
@@ -64,7 +64,7 @@ class SlotGame {
                         reslt.content.winInSpin = winInSpin;
                         reslt.content.wildMultipliar = wildMultipliar
                         upsertObject(reslt.content.email,reslt.content).then(()=>{}).catch(err => {
-                            let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                            let response = falshMessage.resDispatchNotFound(res,'NOT_FOUND');
                             return response;
                         });
                         let data = {
@@ -111,7 +111,7 @@ class SlotGame {
                         result.content.gamblecounter = gamblecounter;
                         result.content.gambleWin = gambleWin;
                         upsertObject(result.content.email,result.content).then(()=>{}).catch(err => {
-                            let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                            let response = falshMessage.resDispatchNotFound(res,'NOT_FOUND');
                             return response;
                         });
 
@@ -155,7 +155,7 @@ class SlotGame {
                 result.content.wallet = collectWallet.wallet;
                 result.content.gamblecounter = collectWallet.gamblecounter;
                 upsertObject(result.content.email,result.content).then(()=>{}).catch(err => {
-                    let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                    let response = falshMessage.resDispatchNotFound(res,'NOT_FOUND');
                     return response;
                 });
 

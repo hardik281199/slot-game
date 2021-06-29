@@ -40,7 +40,7 @@ class Auth {
     login(req, res) {
         getObject(req.body.email).then((account) =>{  
             if(!account) {
-                let response = falshMessage.resDispatchError(res,'FIRST_REG');
+                let response = falshMessage.resDispatchNotFound(res,'FIRST_REG');
                 return response;
             }
             Bcrypt.compare(req.body.password,account.value.password ,(error,result)=>{

@@ -35,5 +35,12 @@ module.exports = {
         ERROR :'some something wrong please check error',
         ALL_READY_DELETED : 'this game allready  deleted',
         NOT_GAME_EXISTS : 'this game not exist'
-    }
+    },
+
+    HTTP_STATUS: {
+        OK: 200,
+        NOT_FOUND: 422,
+        VALIDATION_ERROR: 400,
+        UNAUTHENTICATION : 401
+    },
 }

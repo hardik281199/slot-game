@@ -80,7 +80,7 @@ class GameValidator{
         })
         const result = gameConfigSchema.validate(req.body);
         if (result.error) {
-            return falshMessage.resDispatchValidationError(res, {
+            return falshMessage.resDispatchJOIValidationError(res, {
             "isError" : true,
             "message" : result.error.details[0].message,
             "data" : {}

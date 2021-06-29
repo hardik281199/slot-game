@@ -69,7 +69,7 @@ class GameConfig{
                 return response;
             }
         }).catch(error =>{
-            let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+            let response = falshMessage.resDispatchNotFound(res,'NOT_FOUND');
             return response;
         })
     }
@@ -93,7 +93,7 @@ class GameConfig{
             }
             
         }).catch(error =>{
-            let response = falshMessage.resDispatchError(res,'NOT_GAME_EXISTS');
+            let response = falshMessage.resDispatchNotFound(res,'NOT_GAME_EXISTS');
             return response;
         })
     }
@@ -143,8 +143,17 @@ class GameConfig{
         });
     }
 
+    /**
+     * this function get specific game information.
+     * @param {Request} req 
+     * @param {response} res 
+     */
     getGame = (req,res) =>{
-
+        getObject(req.params.gameName).then((game) =>{
+            let mapData = mapper.gameConfigeEditUpdateDelete(game.content);
+            let response = falshMessage.resDispatch(res,'OK',mapData);
+            return response;
+        });
     }
 }
 
