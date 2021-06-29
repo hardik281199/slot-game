@@ -31,7 +31,12 @@ class Dispatcher {
             "data" : {}
         }
         res.send (jsonResponse);
-        return false
+        return false;
+    }
+
+    resDispatchValidationError(res,jsonData){
+        res.send(jsonData);
+        return false;
     }
 }
 

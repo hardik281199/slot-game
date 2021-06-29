@@ -24,11 +24,11 @@ module.exports = (app) => {
 
     app.delete('/games/:gameName',gameConfig.deletGameObject);
 
-    app.get('/games',gameConfig.getAllGame);
+    //app.get('/games',gameConfig.getAllGame);
 
-    app.get('/games/:gameName',gameConfig.getGame);
+    app.get('/games',gameConfig.indexing);
 
-    app.post('/allGame',gameConfig.indexing);
+    //app.post('/allGame',gameConfig.indexing);
 
     app.post('/gamble', verifyToken.checkToken,slotGame.gameble);
 

@@ -1,4 +1,4 @@
-const { upsertObject , getObject } = require('../connection/con');
+const { upsertObject } = require('../connection/con');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
 const { gameVariable } = require('./gameData');
 const { DBDocType } = require('../configuration/constants');
@@ -21,7 +21,7 @@ class GameConfig{
         upsertObject(gameVariable.gameName,gameVariable).then((result) =>{
             console.log("Myjackpot game seeded Successfully");
         }).catch(err => {
-            console.log("error" + err);
+            console.log("error :" + err);
         });
     
     }

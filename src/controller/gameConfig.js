@@ -1,4 +1,4 @@
-const { cluster,upsertObject,getObject } = require('../connection/con');
+const { cluster,upsertObject,getObject ,couchbaseN1QLCollection } = require('../connection/con');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
 const { DBDocType } = require('../configuration/constants');
 const { mapper } = require('../mapper/game');
@@ -104,15 +104,14 @@ class GameConfig{
      * @param {response} res 
      */
     getAllGame = (req,res) =>{
-        cluster.query("SELECT * FROM `slot-game` as games WHERE docType='game' and deletedAt == 0", (err, rows) => {
-            if(err){
-                let response = falshMessage.resDispatchError(res,'ERROR');
+        couchbaseN1QLCollection("SELECT * FROM `slot-game` as games WHERE docType='game' and deletedAt == 0").then((rows) => {
+            const mapData = mapper.allGameConfig(rows.rows);
+            let response = falshMessage.resDispatch(res,'OK',mapData);
+            return response;
+            
+        }).catch(err =>{
+            let response = falshMessage.resDispatchError(res,'ERROR');
                 return response;
-            }else{
-                const mapData = mapper.allGameConfig(rows.rows);
-                let response = falshMessage.resDispatch(res,'OK',mapData);
-                return response;
-            }
         });
     }
 
@@ -134,13 +133,14 @@ class GameConfig{
         } else {
             foundGameQuary = foundGameQuary + paginateQuery;
         }
-        cluster.query(countGameQuary, (err,games) =>{
-            cluster.query(foundGameQuary,(err,result) =>{
+        couchbaseN1QLCollection(countGameQuary).then((games) =>{
+            couchbaseN1QLCollection(foundGameQuary).then((result) =>{
+
                 let mapData = mapper.allGameConfig(result.rows , page,games.rows[0].totalGame , perPage);
                 let response = falshMessage.resDispatch(res,'OK',mapData);
                 return response;
-            })
-        })
+            });
+        });
     }
 
     getGame = (req,res) =>{

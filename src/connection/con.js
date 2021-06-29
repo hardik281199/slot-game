@@ -42,10 +42,22 @@ const upsertObject = (key,data) =>{
    });
 }
 
+const couchbaseN1QLCollection = (queryData) =>{
+   return new Promise((resolve , reject)=>{
+      cluster.query(queryData,(err,res) =>{
+         if (err) {
+            return reject(err);
+         } else {
+            return resolve(res);
+         }
+      });
+   });
+}
+
 
 module.exports = {
-   couchbaseCollection: coll,
+   couchbaseCollection : coll,
    cluster,
-   getObject, upsertObject
+   getObject, upsertObject,couchbaseN1QLCollection
 };
 // export const couchbaseCollection = collection;

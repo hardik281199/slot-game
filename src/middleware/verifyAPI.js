@@ -33,7 +33,7 @@ class GameValidator{
                 SCATTER: payObject
             }).required(),
             arrayOfReel : Joi.array().items(Joi.array().items(Joi.string())).length(Joi.ref('viewZone.columns', { render: true })).required(),
-            maxWinAmount : Joi.number().required(),
+            maxWinAmount : Joi.number().positive().required(),
             docType : Joi.string().valid('game')
         })
         const result = gameConfigSchema.validate(req.body);
@@ -75,14 +75,17 @@ class GameValidator{
                 SCATTER: payObject
             }).required(),
             arrayOfReel : Joi.array().items(Joi.array().items(Joi.string())).length(Joi.ref('viewZone.columns', { render: true })).required(),
-            maxWinAmount : Joi.number().required(),
+            maxWinAmount : Joi.number().positive().required(),
             docType : Joi.string().valid('game')
         })
         const result = gameConfigSchema.validate(req.body);
-        if(result.error){
-            console.log(result.error);
-            return falshMessage.resDispatchError(res, 'GAME_VARIABLE_ERROR');
-        }else{
+        if (result.error) {
+            return falshMessage.resDispatchValidationError(res, {
+            "isError" : true,
+            "message" : result.error.details[0].message,
+            "data" : {}
+        });
+        } else {
             return next();
         }
     }
