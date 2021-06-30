@@ -12,8 +12,8 @@ class GameConfig{
      * @param {response} res 
      */
     seedGameObject = () =>{
-        let docType = DBDocType.GAME;
-        let createdAt = Date.now();
+        const docType = DBDocType.GAME;
+        const createdAt = Date.now();
         gameVariable.docType = docType ;
         gameVariable.createdAt = createdAt ;
         gameVariable.deletedAt = 0;
