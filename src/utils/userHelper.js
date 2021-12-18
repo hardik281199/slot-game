@@ -20,7 +20,7 @@ class GameFunction{
             winInSpin : 0,
             gamblecounter : 0,
             gambleWin :0,
-            gamble_history :[]
+            gambleHistory :[]
         }
         return account;
     }

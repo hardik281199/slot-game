@@ -3,7 +3,7 @@ const {couchbaseCollection ,getObject , upsertObject } = require('../connection/
 const JsonWebToken = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
-const { user } = require('../utils/UserHelper')
+const { user } = require('../utils/userHelper')
 
 class Auth {
 
@@ -40,7 +40,7 @@ class Auth {
     login(req, res) {
         getObject(req.body.email).then((account) =>{  
             if(!account) {
-                let response = falshMessage.resDispatchError(res,'FIRST_REG');
+                let response = falshMessage.resDispatchNotFound(res,'FIRST_REG');
                 return response;
             }
             Bcrypt.compare(req.body.password,account.value.password ,(error,result)=>{

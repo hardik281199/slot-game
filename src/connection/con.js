@@ -1,8 +1,8 @@
 const couchbase = require('couchbase');
 
 const cluster = new couchbase.Cluster("couchbase://localhost", {
-   username: 'hardik',
-   password: 'Hardik@123',
+   username: process.env.COUCHBASE_USERNAME,
+   password: process.env.COUCHBASE_PASSWORD,
 });
 var bucket = cluster.bucket('slot-game');
 var coll = bucket.defaultCollection();
@@ -42,8 +42,27 @@ const upsertObject = (key,data) =>{
    });
 }
 
+/**
+ * connection data base && get data using N1QL
+ * @param {query} queryData 
+ * @returns 
+ */
+const couchbaseN1QLCollection = (queryData) =>{
+   return new Promise((resolve , reject)=>{
+      cluster.query(queryData,(err,res) =>{
+         if (err) {
+            return reject(err);
+         } else {
+            return resolve(res);
+         }
+      });
+   });
+}
+
+
 module.exports = {
-   couchbaseCollection: coll,
-   getObject, upsertObject
+   couchbaseCollection : coll,
+   cluster,
+   getObject, upsertObject,couchbaseN1QLCollection
 };
 // export const couchbaseCollection = collection;

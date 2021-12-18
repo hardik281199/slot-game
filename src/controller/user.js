@@ -31,7 +31,7 @@ class UserDetails {
             let winInSpin = result.content.winInSpin;
             let gamblecounter = result.content.gamblecounter;
             let gambleWin = result.content.gambleWin;
-            let gamble_history = result.content.gamble_history;
+            let gambleHistory = result.content.gambleHistory;
 
             let data ={
                 "wallet": wallet,
@@ -41,7 +41,7 @@ class UserDetails {
                 "winInSpin" : winInSpin,
                 "gamblecounter" : gamblecounter,
                 "gambleWin" : gambleWin,
-                "gamble_history " : gamble_history
+                "gambleHistory " : gambleHistory
             };
             let response = falshMessage.resDispatch(res,'USER_DETAILS',data);
             return response;

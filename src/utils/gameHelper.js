@@ -1,3 +1,4 @@
+const { card } = require('../configuration/constants')
 class GameHelper{
 
     /**
@@ -375,23 +376,20 @@ class GameHelper{
      * @returns gamblecounter,gambleWin,winInSpin
      */
     conutGamble = (req,result,gameVariable) => { 
-        let winInSpin = result.content.winInSpin;
-        let gamblecounter = result.content.gamblecounter;
-        let gambleWin = result.content.gambleWin;
-        let gamble_history = result.content.gamble_history;
-        let gambleCard = this.randomGambleCard(gameVariable.content.gambleCard);
+        let { winInSpin,gamblecounter,gambleWin,gambleHistory} = result.content;
+        let gambleCard = this.randomGambleCard(card);
         if(req.body.card ===gambleCard){
             gamblecounter += 1;
             gambleWin = winInSpin;
             winInSpin = winInSpin *2;
-            gamble_history.push(gambleCard);
+            gambleHistory.push(gambleCard);
         }else{
             gamblecounter = 0;
             gambleWin = 0;
-            gamble_history = [];
+            gambleHistory = [];
             winInSpin = 0;
         }
-        return {gambleWin ,winInSpin ,gamblecounter,gamble_history }
+        return {gambleWin ,winInSpin ,gamblecounter,gambleHistory }
     }
 
     /**
@@ -400,11 +398,7 @@ class GameHelper{
      * @returns 
      */
     collectWallet = (result) =>{
-        let wallet = result.content.wallet;
-        let winInSpin = result.content.winInSpin;
-        let gamblecounter = result.content.gamblecounter;
-        let gambleWin = result.content.gambleWin;
-        let wildMultipliar =result.content.wildMultipliar;
+        let { wallet , winInSpin , gamblecounter , gambleWin , wildMultipliar } = result.content ;
         wallet = wallet + (winInSpin * wildMultipliar );
         if(gambleWin > 0 ){
             gamblecounter = 0;

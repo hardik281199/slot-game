@@ -18,7 +18,7 @@ class VerifyToken {
             if(bearerToken.length == 2 && bearerToken[0].toLowerCase() == "bearer") {
                 JsonWebToken.verify(bearerToken[1],process.env.JWT_SECRET,(error, token) =>{
                     if(error) {
-                        let response = falshMessage.resDispatchError(res,'FAILED_AUTHENTICATION');
+                        let response = falshMessage.resDispatchUnAuthorize(res,'FAILED_AUTHENTICATION');
                         return response;
                     }
                     req.token = token;
@@ -29,7 +29,7 @@ class VerifyToken {
                 return false;
             }
         } else {
-            let response = falshMessage.resDispatchError(res,'FAILED_AUTHENTICATION');
+            let response = falshMessage.resDispatchUnAuthorize(res,'FAILED_AUTHENTICATION');
             return response;
         }
     }
