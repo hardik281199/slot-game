@@ -1,6 +1,6 @@
 
 const { getObject , upsertObject } = require('../connection/con');
-const { gameHelper } = require('../utils/gamehelper');
+const { gameHelper } = require('../utils/gameHelper');
 const { falshMessage } = require('../dispatcher/responseDispatcher');
 
 class SlotGame {
@@ -13,16 +13,10 @@ class SlotGame {
     gameFunction = (req, res) => {
         getObject(req.token.email).then((reslt) =>{
             if (!reslt.content.jwt){
-                let response = falshMessage.resDispatchError(res,'FAILED_AUTHENTICATION');
+                let response = falshMessage.resDispatchUnAuthorize(res,'FAILED_AUTHENTICATION');
                 return response;
             }else {
-                let wallet = reslt.content.wallet;
-                let betAmount = reslt.content.betAmount;
-                let freeSpin = reslt.content.freeSpin;
-                let WinFreeSpinAmount = reslt.content.WinFreeSpinAmount;
-                let totalfreeSpin = reslt.content.totalfreeSpin;
-                let winInSpin =reslt.content.winInSpin;
-                let wildMultipliar =reslt.content.wildMultipliar;
+                let { wallet,betAmount,freeSpin,WinFreeSpinAmount,totalfreeSpin,winInSpin,wildMultipliar } = reslt.content;
                 if(winInSpin === 0){
                     getObject("MyJackpot").then((gameVariable) =>{
                         // Generate ViewZone
@@ -39,8 +33,8 @@ class SlotGame {
                         wallet = checkPayline.wallet;
                         winInSpin = checkPayline.winAmount;
                         let checkfreeSpin = checkPayline.freeSpin
-                         // free spin counting and free spin not occurred
-                         if(freeSpin !== 0){
+                        // free spin counting and free spin not occurred
+                        if(freeSpin !== 0){
                             freeSpin--;
                             checkfreeSpin--;
                         }else{
@@ -70,7 +64,7 @@ class SlotGame {
                         reslt.content.winInSpin = winInSpin;
                         reslt.content.wildMultipliar = wildMultipliar
                         upsertObject(reslt.content.email,reslt.content).then(()=>{}).catch(err => {
-                            let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                            let response = falshMessage.resDispatchNotFound(res,'NOT_FOUND');
                             return response;
                         });
                         let data = {
@@ -101,11 +95,7 @@ class SlotGame {
      */
     gameble =(req,res) =>{
         getObject(req.token.email).then((result) =>{
-            let winInSpin = result.content.winInSpin;
-            let gamblecounter = result.content.gamblecounter; 
-            let gambleWin = result.content.gambleWin;
-            let gamble_amount = result.content.gamble_amount;
-            let gamble_history = result.content.gamble_history;
+            let { winInSpin,gamblecounter,gambleWin,gamble_history} = result.content;
             if (result.content.winInSpin !== 0) {
                 
                 getObject("MyJackpot").then((gameVariable) =>{
@@ -115,23 +105,19 @@ class SlotGame {
                         gamblecounter = gambleResponse.gamblecounter;
                         gambleWin = gambleResponse.gambleWin;
                         gamble_history = gambleResponse.gamble_history;
-                        gamble_amount = gambleResponse.gamble_amount;
-
+                        
                         result.content.gamble_history = gamble_history;
                         result.content.winInSpin = winInSpin ;
                         result.content.gamblecounter = gamblecounter;
                         result.content.gambleWin = gambleWin;
                         upsertObject(result.content.email,result.content).then(()=>{}).catch(err => {
-                            let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                            let response = falshMessage.resDispatchNotFound(res,'NOT_FOUND');
                             return response;
                         });
 
                         let data ={
-                            gamblecounter : gambleResponse.gamblecounter,
                             GambleWinTriggered : gambleResponse.winInSpin ==0 ? false : true,
-                            winInSpin : gambleResponse.winInSpin,
-                            gambleWin : gambleResponse.gambleWin,
-                            gamble_history : gambleResponse.gamble_history
+                            gambleResponse
                         }
                         let response = falshMessage.resDispatch(res,'OK',data);
                         return response;
@@ -155,10 +141,7 @@ class SlotGame {
      */
     collect =(req,res) =>{
         getObject(req.token.email).then((result) =>{
-            let wallet = result.content.wallet;
-            let winInSpin = result.content.winInSpin;
-            let gamblecounter = result.content.gamblecounter;
-            let wildMultipliar =result.content.wildMultipliar;
+            let {wallet, winInSpin, gamblecounter, wildMultipliar} = result.content;
             if (result.content.winInSpin !== 0) {
                 
                 let collectWallet = gameHelper.collectWallet(result);
@@ -172,7 +155,7 @@ class SlotGame {
                 result.content.wallet = collectWallet.wallet;
                 result.content.gamblecounter = collectWallet.gamblecounter;
                 upsertObject(result.content.email,result.content).then(()=>{}).catch(err => {
-                    let response = falshMessage.resDispatchError(res,'NOT_FOUND');
+                    let response = falshMessage.resDispatchNotFound(res,'NOT_FOUND');
                     return response;
                 });
 

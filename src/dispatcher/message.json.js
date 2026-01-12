@@ -27,6 +27,20 @@ module.exports = {
         COLLECT_RES :'Please first win in spin then play `COLLECT` win amount',
         GAMBLE_FINISH : 'Please collect you Gamble win amount , your win finish',
         GAME_DATA : 'Game has been added successfully',
-        GAME_VARIABLE_ERROR : 'this data is not valid , please check something wrong '
-    }
+        GAME_VARIABLE_ERROR : 'this data is not valid , please check something wrong ',
+        GAME_EXISTS : 'This `Game` is exists',
+        GAMENAME_NOT_CHANGE : 'Game name can not edit',
+        CREATEDAT_NOT_CHANGE : 'CreateAt can not edit',
+        DELETE_GAMECONFIG : 'game config deleted successfully',
+        ERROR :'some something wrong please check error',
+        ALL_READY_DELETED : 'this game allready  deleted',
+        NOT_GAME_EXISTS : 'this game not exist'
+    },
+
+    HTTP_STATUS: {
+        OK: 200,
+        NOT_FOUND: 422,
+        VALIDATION_ERROR: 400,
+        UNAUTHENTICATION : 401
+    },
 }

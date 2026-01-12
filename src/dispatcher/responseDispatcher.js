@@ -1,4 +1,4 @@
-const { RES_MESSAGES } = require('./message.json');
+const { RES_MESSAGES ,HTTP_STATUS } = require('./message.json');
 
 class Dispatcher {
     /**
@@ -14,6 +14,7 @@ class Dispatcher {
             "message" : RES_MESSAGES[`${message}`],
             "data" :data
         }
+        res.statusCode = HTTP_STATUS.OK;
         res.send (jsonResponse);
         return true;
     }
@@ -30,9 +31,58 @@ class Dispatcher {
             "message" : RES_MESSAGES[`${message}`],
             "data" : {}
         }
+        res.statusCode = HTTP_STATUS.VALIDATION_ERROR;
         res.send (jsonResponse);
-        return false
+        return false;
     }
+
+    /**
+     * this function use to NOT_FOUND data
+     * @param {response} res 
+     * @param {message} message 
+     * @returns 
+     */
+    resDispatchNotFound(res,message){
+        let jsonResponse ={
+            "isError" : true,
+            "message" : RES_MESSAGES[`${message}`],
+            "data" : {}
+        }
+        res.statusCode = HTTP_STATUS.NOT_FOUND;
+        res.send (jsonResponse);
+        return false;
+    }
+
+    /**
+     * this function send UNAUTHENTICATION token error
+     * @param {response} res 
+     * @param {message} message 
+     * @returns 
+     */
+    resDispatchUnAuthorize(res,message){
+        let jsonResponse ={
+            "isError" : true,
+            "message" : RES_MESSAGES[`${message}`],
+            "data" : {}
+        }
+        res.statusCode = HTTP_STATUS.UNAUTHENTICATION;
+        res.send (jsonResponse);
+        return false;
+    }
+
+
+    /**
+     * this function send proper response 
+     * @param {response} res 
+     * @param {data} jsonData 
+     * @returns 
+     */
+    resDispatchJOIValidationError(res,jsonData){
+        res.statusCode = HTTP_STATUS.VALIDATION_ERROR;
+        res.send(jsonData);
+        return false;
+    }
+
 }
 
 const resDispatch = new Dispatcher();
